@@ -43,6 +43,7 @@ from app.models import Post
 from app.schemas.author import AuthorCreate, AuthorOut
 from app.schemas.enums import PostStatus
 from app.schemas.post import PostCreate, PostOut
+from app.services.email import send_welcome_email
 from app.services.external import blocking_cpu_task
 from app.services.stats import aggregate_with_gather
 from app.services.upload import validate_and_read
@@ -374,14 +375,21 @@ async def stats_with_ctx(
 async def db_create_post(
     payload: PostCreate,
     db: Annotated[AsyncSession, Depends(get_async_db)],
+    background_tasks: BackgroundTasks,
 ) -> dict:
-    """创建文章（DB 持久化）。title 重复 -> IntegrityError -> 409。"""
+    """创建文章（DB 持久化）。title 重复 -> IntegrityError -> 409。
+
+    task-13：创建成功后用 BackgroundTasks 异步触发"欢迎邮件"，
+    响应不会被邮件发送阻塞。
+    """
     from sqlalchemy.exc import IntegrityError
 
     try:
         post = await crud_create_post(db, title=payload.title, content=payload.content)
     except IntegrityError as exc:
         raise BizDuplicate from exc
+    # 邮件发送在响应之后才跑
+    background_tasks.add_task(send_welcome_email, "author@example.com", post.title)
     return _post_to_dict(post)
 
 
