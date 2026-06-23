@@ -31,6 +31,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.auth import get_current_jwt_author
 from app.api.auth import router as auth_router
+from app.api.versioned import v1_router, v2_router
 from app.api.ws_comments import router as ws_router
 from app.core.deps import get_current_active_author, get_db
 from app.core.exceptions import PostNotFound
@@ -49,11 +50,44 @@ from app.services.external import blocking_cpu_task
 from app.services.stats import aggregate_with_gather
 from app.services.upload import validate_and_read
 
+TAGS_METADATA = [
+    {"name": "posts", "description": "文章 CRUD（含 /posts 内存版 + /db/posts 持久化版）"},
+    {"name": "users", "description": "作者 / 用户相关"},
+    {"name": "auth", "description": "注册 / 登录 / JWT"},
+    {"name": "stats", "description": "异步聚合统计"},
+    {"name": "system", "description": "根路径 / 健康检查"},
+]
+
 app = FastAPI(
     title="Blog API",
     version="0.1.0",
     description="Python FastAPI 从入门到精通（博客渐进式实战）",
+    openapi_tags=TAGS_METADATA,
 )
+
+
+def _customize_openapi() -> None:
+    """自定义 app.openapi()：注入 x-logo 等扩展字段。"""
+    from fastapi.openapi.utils import get_openapi
+
+    def custom_openapi():
+        if app.openapi_schema:
+            return app.openapi_schema
+        schema = get_openapi(
+            title=app.title,
+            version=app.version,
+            description=app.description,
+            routes=app.routes,
+            tags=TAGS_METADATA,
+        )
+        schema["info"]["x-logo"] = {"url": "https://example.com/logo.png"}
+        app.openapi_schema = schema
+        return schema
+
+    app.openapi = custom_openapi
+
+
+_customize_openapi()
 
 # task-9：注册中间件（Timing / RequestID / CORS）
 # 在 app 装配阶段调用 register_middleware，让中间件参与到所有路由的请求/响应处理
@@ -72,6 +106,16 @@ app.include_router(auth_router)
 # task-14：挂载 WebSocket 路由（/ws/posts/{id}/comments）
 app.include_router(ws_router)
 
+# task-15：API 版本化（v1 / v2 共存）
+app.include_router(v1_router)
+app.include_router(v2_router)
+
+
+@app.get("/posts/old", deprecated=True, tags=["posts"])
+def legacy_list_posts() -> list[dict]:
+    """旧版列表端点（已弃用，请改用 /posts）。"""
+    return POSTS
+
 
 # task-12：/me 端点（JWT 依赖）
 @app.get("/me", response_model=AuthorOut)
@@ -85,7 +129,7 @@ async def me(
 # 数据层在 app.data，main.py 通过 import 引用（避免与 core/deps.py 循环 import）
 
 
-@app.get("/")
+@app.get("/", tags=["system"])
 def root() -> dict:
     """根路径，返回博客基本信息与文档入口。"""
     return {
@@ -95,7 +139,7 @@ def root() -> dict:
     }
 
 
-@app.get("/health")
+@app.get("/health", tags=["system"])
 def health() -> dict:
     """健康检查端点。"""
     return {"status": "ok"}
