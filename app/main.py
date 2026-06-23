@@ -43,6 +43,12 @@ app = FastAPI(
     description="Python FastAPI 从入门到精通（博客渐进式实战）",
 )
 
+# task-9：注册中间件（Timing / RequestID / CORS）
+# 在 app 装配阶段调用 register_middleware，让中间件参与到所有路由的请求/响应处理
+from app.core.middleware import register_middleware  # noqa: E402
+
+register_middleware(app)
+
 # 数据层在 app.data，main.py 通过 import 引用（避免与 core/deps.py 循环 import）
 
 

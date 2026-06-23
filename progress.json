@@ -1,8 +1,8 @@
 {
   "goal": "制作一套 Python FastAPI 从入门到精通的完整教学内容（面向通用读者，文档分层标注难度），使用最新稳定版（FastAPI 0.115+ / Pydantic 2.x / SQLAlchemy 2.x），所有 20 个 task 共同构建同一个渐进式博客系统：从 task-1 的项目骨架开始，每个 task 引入一个新知识点并扩展博客功能，最终在 task-20 汇成完整的博客 API（文章/作者/评论/标签/统计），每个案例配教学文档 + 可运行源码 + ≥8 条 pytest 测试",
   "total": 20,
-  "completed": 8,
-  "rounds": 8,
+  "completed": 9,
+  "rounds": 9,
   "max_rounds": 120,
   "project_storyline": "渐进式构建一个博客系统 API。task-1 搭骨架，task-2~16 每步引入一个 FastAPI 知识点扩展功能，task-17~19 完成工程化（结构/缓存/部署），task-20 整合验收。最终交付完整可运行博客系统。",
   "conventions": {
@@ -69,13 +69,14 @@
       "title": "异步编程 async/await",
       "plan": "为博客加 GET /stats/aggregate 接口：async 并发调用 3 个模拟外部服务（拉取阅读量、评论数、点赞数），用 asyncio.gather；对比同步串行 vs 异步并发的耗时差异（asyncio.sleep 模拟）；async 依赖 get_async_client；阻塞任务用 run_in_executor 委托线程池。docs/lessons/08-async.md。tests/test_08_async.py 至 least 8 条：接口正常返回聚合数据、并发耗时显著小于串行（用 time.monotonic 断言）、asyncio.gather 异常处理、超时 asyncio.wait_for、async 依赖、BackgroundTasks 与 async 配合、阻塞任务走线程池、async context manager 依赖。",
       "status": "done",
-      "committed_sha": "PENDING"
+      "committed_sha": "a6264a0"
     },
     {
       "id": 9,
       "title": "中间件 Middleware",
       "plan": "为博客加三个中间件：①耗时统计中间件 X-Response-Time；②CORSMiddleware 允许博客前端域名；③请求 ID 中间件 X-Request-ID（每请求生成 UUID，绑到 request.state）。讲解 @app.middleware/http vs BaseHTTPMiddleware。docs/lessons/09-middleware.md。tests/test_09_middleware.py 至 least 8 条：响应含 X-Response-Time、响应含 X-Request-ID、CORS 预检 OPTIONS 通过、CORS 非白名单域名被拒、中间件执行顺序正确、异常穿越中间件、request.state 携带 request_id、BaseHTTPMiddleware 与 http 装饰器对比。",
-      "status": "todo"
+      "status": "done",
+      "committed_sha": "PENDING"
     },
     {
       "id": 10,
