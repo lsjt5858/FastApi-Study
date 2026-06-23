@@ -12,10 +12,20 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import (
+    Cookie,
+    FastAPI,
+    File,
+    Form,
+    Header,
+    HTTPException,
+    Query,
+    UploadFile,
+)
 
 from app.schemas.enums import PostStatus
 from app.schemas.post import PostCreate
+from app.services.upload import validate_and_read
 
 app = FastAPI(
     title="Blog API",
@@ -120,3 +130,48 @@ def get_user(username: str) -> dict:
         if u["username"] == username:
             return u
     raise HTTPException(status_code=404, detail="User not found")
+
+
+@app.post("/posts/{post_id}/cover", status_code=201)
+async def upload_cover(
+    post_id: int,
+    file: UploadFile,
+    alt_text: Annotated[str, Form(min_length=1, max_length=200)],
+    x_upload_token: Annotated[str | None, Header()] = None,
+    upload_session_id: Annotated[str | None, Cookie()] = None,
+) -> dict:
+    """上传单篇封面。
+
+    演示四种"非 JSON"输入：
+    - UploadFile: multipart 里的二进制
+    - Form: multipart 里的纯文本字段
+    - Header: 请求头（Python 参数名小写，自动映射 X-Upload-Token）
+    - Cookie: Cookie 头里的某项
+    """
+    if not x_upload_token:
+        raise HTTPException(status_code=401, detail="Missing upload token")
+    data = await validate_and_read(file)
+    return {
+        "post_id": post_id,
+        "size": len(data),
+        "alt_text": alt_text,
+        "session_id": upload_session_id,
+        "filename": file.filename,
+    }
+
+
+@app.post("/posts/{post_id}/covers", status_code=201)
+async def upload_covers(
+    post_id: int,
+    files: Annotated[list[UploadFile], File()],
+    alt_text: Annotated[str, Form(min_length=1, max_length=200)],
+    x_upload_token: Annotated[str | None, Header()] = None,
+) -> dict:
+    """一次上传多张封面。"""
+    if not x_upload_token:
+        raise HTTPException(status_code=401, detail="Missing upload token")
+    sizes = []
+    for f in files:
+        data = await validate_and_read(f)
+        sizes.append({"filename": f.filename, "size": len(data)})
+    return {"post_id": post_id, "count": len(files), "files": sizes, "alt_text": alt_text}
