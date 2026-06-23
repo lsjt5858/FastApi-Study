@@ -27,9 +27,17 @@ from fastapi import (
     UploadFile,
 )
 from fastapi.responses import JSONResponse
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_active_author, get_db
+from app.core.exceptions import PostNotFound
+from app.crud import create_post as crud_create_post
+from app.crud import delete_post as crud_delete_post
+from app.crud import get_post as crud_get_post
+from app.crud import list_posts as crud_list_posts
 from app.data import POSTS, USERS
+from app.db import get_async_db
+from app.models import Post
 from app.schemas.author import AuthorCreate
 from app.schemas.enums import PostStatus
 from app.schemas.post import PostCreate, PostOut
@@ -342,3 +350,82 @@ async def stats_with_ctx(
     要观察 teardown 是否真的执行了，看模块级 _CTX_EVENTS（测试在请求结束后断言它）。
     """
     return {"entered": state["entered"], "exited": state["exited"]}
+
+
+# ---------- task-11：SQLAlchemy 异步 DB 路由（/db/posts 前缀，渐进式新增） ----------
+
+
+@app.post("/db/posts", response_model=PostOut, status_code=201)
+async def db_create_post(
+    payload: PostCreate,
+    db: Annotated[AsyncSession, Depends(get_async_db)],
+) -> dict:
+    """创建文章（DB 持久化）。title 重复 -> IntegrityError -> 409。"""
+    from sqlalchemy.exc import IntegrityError
+
+    try:
+        post = await crud_create_post(db, title=payload.title, content=payload.content)
+    except IntegrityError as exc:
+        raise BizDuplicate from exc
+    return _post_to_dict(post)
+
+
+@app.get("/db/posts", response_model=list[PostOut])
+async def db_list_posts(
+    db: Annotated[AsyncSession, Depends(get_async_db)],
+    limit: Annotated[int, Query(ge=1, le=100)] = 10,
+    offset: Annotated[int, Query(ge=0)] = 0,
+) -> list[dict]:
+    """列表（DB）。"""
+    items = await crud_list_posts(db, limit=limit, offset=offset)
+    return [_post_to_dict(p) for p in items]
+
+
+@app.get("/db/posts/{post_id}", response_model=PostOut)
+async def db_get_post(
+    post_id: int,
+    db: Annotated[AsyncSession, Depends(get_async_db)],
+) -> dict:
+    """详情（DB）。不存在 -> 404 POST_NOT_FOUND。"""
+    post = await crud_get_post(db, post_id)
+    if post is None:
+        raise PostNotFound(post_id=post_id)
+    return _post_to_dict(post)
+
+
+@app.delete("/db/posts/{post_id}", status_code=204)
+async def db_delete_post(
+    post_id: int,
+    db: Annotated[AsyncSession, Depends(get_async_db)],
+) -> None:
+    """删除（DB）。不存在 -> 404 POST_NOT_FOUND。"""
+    deleted = await crud_delete_post(db, post_id)
+    if not deleted:
+        raise PostNotFound(post_id=post_id)
+    return None
+
+
+def _post_to_dict(post: Post) -> dict:
+    """ORM model -> dict（response_model=PostOut 会二次校验）。"""
+    return {
+        "id": post.id,
+        "title": post.title,
+        "content": post.content,
+        "tags": [],
+        "slug": "",
+    }
+
+
+class BizDuplicate(Exception):
+    """title 重复（task-11 路由内联捕获，转 409）。"""
+
+    code = "DUPLICATE_TITLE"
+    status_code = 409
+
+
+@app.exception_handler(BizDuplicate)
+async def _biz_duplicate_handler(request, exc: BizDuplicate) -> JSONResponse:
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"error": {"code": exc.code, "message": "Post title already exists"}},
+    )

@@ -1,8 +1,8 @@
 {
   "goal": "制作一套 Python FastAPI 从入门到精通的完整教学内容（面向通用读者，文档分层标注难度），使用最新稳定版（FastAPI 0.115+ / Pydantic 2.x / SQLAlchemy 2.x），所有 20 个 task 共同构建同一个渐进式博客系统：从 task-1 的项目骨架开始，每个 task 引入一个新知识点并扩展博客功能，最终在 task-20 汇成完整的博客 API（文章/作者/评论/标签/统计），每个案例配教学文档 + 可运行源码 + ≥8 条 pytest 测试",
   "total": 20,
-  "completed": 10,
-  "rounds": 10,
+  "completed": 11,
+  "rounds": 11,
   "max_rounds": 120,
   "project_storyline": "渐进式构建一个博客系统 API。task-1 搭骨架，task-2~16 每步引入一个 FastAPI 知识点扩展功能，task-17~19 完成工程化（结构/缓存/部署），task-20 整合验收。最终交付完整可运行博客系统。",
   "conventions": {
@@ -83,16 +83,14 @@
       "title": "异常处理与全局错误捕获",
       "plan": "为博客定义业务异常体系：PostNotFound(404)、DuplicateSlug(409)、BizError 基类；@app.exception_handler(PostNotFound) 返回统一结构 {error:{code,message}}；@app.exception_handler(RequestValidationError) 改写 422 默认响应；@app.exception_handler(Exception) 兜底 500 并记录日志。docs/lessons/10-exceptions.md。tests/test_10_exceptions.py 至 least 8 条：PostNotFound 返回 404 + 结构、DuplicateSlug 返回 409、422 校验错误结构被改写、未捕获异常返回 500、错误码体系（POST_NOT_FOUND 等）、异常处理器优先级、异常被中间件记录、HTTPException 兼容。",
       "status": "done",
-      "committed_sha": "PENDING"
+      "committed_sha": "2d7f7e7"
     },
     {
       "id": 11,
       "title": "SQLAlchemy 数据库集成（同步 + 异步）",
       "plan": "把内存 POSTS 换成 SQLAlchemy：models.Author / models.Post 用 2.0 DeclarativeBase + Mapped[...]；同步用 sqlite+aiosqlite 异步引擎；deps.get_db 异步 session 依赖；crud/posts.py 实现 create/list/get/update/delete；事务回滚测试。docs/lessons/11-database.md。tests/test_11_database.py 至 least 8 条：创建文章落库、列表查询、更新文章、删除文章、不存在 ID 404、字段约束（title unique）、事务回滚生效、并发会话用独立 sqlite 内存库隔离。",
-      "status": "todo"
-    },
-    {
-      "id": 12,
+      "status": "done",
+      "committed_sha": "PENDING"
       "title": "认证与授权 OAuth2 + JWT",
       "plan": "为博客加作者认证：POST /auth/register 注册、POST /auth/token OAuth2PasswordBearer 登录签发 JWT（PyJWT）、GET /me 依赖 get_current_author、DELETE /posts/{id} 校验只能删自己的文章（scope/owner 校验）。密码用 passlib bcrypt 哈希。docs/lessons/12-auth.md。tests/test_12_auth.py 至 least 8 条：注册 201、重复注册 409、登录成功返回 access_token、密码错误 401、无 token 访问 /me 401、token 过期 401、伪造 token 401、删除他人文章 403。",
       "status": "todo"
