@@ -14,6 +14,7 @@ from typing import Annotated
 
 from fastapi import (
     Cookie,
+    Depends,
     FastAPI,
     File,
     Form,
@@ -25,6 +26,8 @@ from fastapi import (
 )
 from fastapi.responses import JSONResponse
 
+from app.core.deps import get_current_active_author, get_db
+from app.data import POSTS, USERS
 from app.schemas.enums import PostStatus
 from app.schemas.post import PostCreate, PostOut
 from app.services.upload import validate_and_read
@@ -35,68 +38,7 @@ app = FastAPI(
     description="Python FastAPI 从入门到精通（博客渐进式实战）",
 )
 
-# task-5 阶段：POSTS 加 is_deleted / author 字段用于演示响应过滤
-INTERNAL_AUTHOR_ALICE: dict = {
-    "id": 1,
-    "username": "alice",
-    "display_name": "Alice",
-    "password": "super-secret-hash",  # 内部字段，绝不能出现在响应
-    "email": "alice@internal.local",
-}
-
-POSTS: list[dict] = [
-    {
-        "id": i,
-        "title": f"Post {i}",
-        "content": f"Content of post {i}.",
-        "published": True,
-        "status": "published",
-        "tags": ["py"],
-        "metadata": None,
-        "is_deleted": False,
-        "author": INTERNAL_AUTHOR_ALICE if i % 3 == 1 else None,
-    }
-    for i in range(1, 13)
-] + [
-    {
-        "id": 13,
-        "title": "Draft Post",
-        "content": "A draft.",
-        "published": False,
-        "status": "draft",
-        "tags": [],
-        "metadata": None,
-        "is_deleted": False,
-        "author": None,
-    },
-    {
-        "id": 14,
-        "title": "Archived Post",
-        "content": "An archived post.",
-        "published": False,
-        "status": "archived",
-        "tags": [],
-        "metadata": None,
-        "is_deleted": True,  # 内部状态：归档且软删除
-        "author": None,
-    },
-    {
-        "id": 15,
-        "title": "Hidden Post",
-        "content": "Unpublished.",
-        "published": False,
-        "status": "draft",
-        "tags": [],
-        "metadata": None,
-        "is_deleted": False,
-        "author": None,
-    },
-]
-
-USERS: list[dict] = [
-    {"username": "alice", "display_name": "Alice"},
-    {"username": "bob", "display_name": "Bob"},
-]
+# 数据层在 app.data，main.py 通过 import 引用（避免与 core/deps.py 循环 import）
 
 
 @app.get("/")
@@ -171,8 +113,15 @@ def get_post_full(post_id: int) -> dict:
 
 
 @app.post("/posts", response_model=PostOut, status_code=201)
-def create_post(payload: PostCreate, response: Response) -> dict:
+def create_post(
+    payload: PostCreate,
+    response: Response,
+    db: Annotated[dict, Depends(get_db)],
+) -> dict:
     """创建文章。
+
+    task-6 新增：依赖注入 get_db（演示 yield 依赖）。
+    task-6 暂不要求 Authorization（在 DELETE 上演示权限）。
 
     - response_model=PostOut: 返回时过滤敏感字段
     - response.set_cookie: 演示在响应里下发 Cookie
@@ -194,6 +143,27 @@ def create_post(payload: PostCreate, response: Response) -> dict:
         samesite="lax",
     )
     return post
+
+
+@app.delete("/posts/{post_id}", status_code=204)
+def delete_post(
+    post_id: int,
+    author: Annotated[dict, Depends(get_current_active_author)],
+) -> None:
+    """删除文章。
+
+    task-6 新增：依赖注入 get_current_active_author 演示"必须当前作者"。
+    缺 token → 401（get_current_author 抛）。
+    token 非激活 → 403（get_current_active_author 抛）。
+    """
+    for i, p in enumerate(POSTS):
+        if p["id"] == post_id:
+            POSTS.pop(i)
+            return None
+    return JSONResponse(
+        status_code=404,
+        content={"error": {"code": "POST_NOT_FOUND", "message": "Not found"}},
+    )
 
 
 @app.get("/users/{username}")

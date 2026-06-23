@@ -1,8 +1,8 @@
 {
   "goal": "制作一套 Python FastAPI 从入门到精通的完整教学内容（面向通用读者，文档分层标注难度），使用最新稳定版（FastAPI 0.115+ / Pydantic 2.x / SQLAlchemy 2.x），所有 20 个 task 共同构建同一个渐进式博客系统：从 task-1 的项目骨架开始，每个 task 引入一个新知识点并扩展博客功能，最终在 task-20 汇成完整的博客 API（文章/作者/评论/标签/统计），每个案例配教学文档 + 可运行源码 + ≥8 条 pytest 测试",
   "total": 20,
-  "completed": 4,
-  "rounds": 4,
+  "completed": 5,
+  "rounds": 5,
   "max_rounds": 120,
   "project_storyline": "渐进式构建一个博客系统 API。task-1 搭骨架，task-2~16 每步引入一个 FastAPI 知识点扩展功能，task-17~19 完成工程化（结构/缓存/部署），task-20 整合验收。最终交付完整可运行博客系统。",
   "conventions": {
@@ -47,7 +47,8 @@
       "id": 5,
       "title": "响应模型 response_model 与状态码",
       "plan": "为博客接口加响应模型：schemas.PostOut（不含作者密码等敏感字段）、AuthorOut。GET /posts 用 response_model=list[PostOut]；POST 返回 201；response_model_exclude 隐藏 is_deleted；response_model_include 仅暴露白名单；404 用 JSONResponse 自定义结构；set_cookie 在响应里下发会话。docs/lessons/05-response.md。tests/test_05_response.py 至少 8 条：敏感字段被过滤、exclude 隐藏 is_deleted、include 只暴露 id+title、POST 201、404 自定义 JSON 结构、响应 set_cookie、自定义 header X-Blog-Version、嵌套作者敏感字段也被过滤。",
-      "status": "todo"
+      "status": "done",
+      "committed_sha": "16beb76"
     },
     {
       "id": 6,
