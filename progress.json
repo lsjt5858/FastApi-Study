@@ -1,8 +1,8 @@
 {
   "goal": "制作一套 Python FastAPI 从入门到精通的完整教学内容（面向通用读者，文档分层标注难度），使用最新稳定版（FastAPI 0.115+ / Pydantic 2.x / SQLAlchemy 2.x），所有 20 个 task 共同构建同一个渐进式博客系统：从 task-1 的项目骨架开始，每个 task 引入一个新知识点并扩展博客功能，最终在 task-20 汇成完整的博客 API（文章/作者/评论/标签/统计），每个案例配教学文档 + 可运行源码 + ≥8 条 pytest 测试",
   "total": 20,
-  "completed": 13,
-  "rounds": 13,
+  "completed": 14,
+  "rounds": 14,
   "max_rounds": 120,
   "project_storyline": "渐进式构建一个博客系统 API。task-1 搭骨架，task-2~16 每步引入一个 FastAPI 知识点扩展功能，task-17~19 完成工程化（结构/缓存/部署），task-20 整合验收。最终交付完整可运行博客系统。",
   "conventions": {
@@ -104,13 +104,14 @@
       "title": "后台任务 BackgroundTasks 与定时任务",
       "plan": "为博客加异步副作用：POST /posts 创建成功后 BackgroundTasks 触发 send_welcome_email（模拟）；APScheduler startup 事件启动定时任务：每分钟统计热门文章写入 hot_posts 表；shutdown 事件清理。对比 Celery 适用场景。docs/lessons/13-background.md。tests/test_13_background.py 至 least 8 条：BackgroundTasks 被调用、任务在响应后执行、任务异常不影响响应、多任务顺序执行、startup 事件触发、shutdown 事件触发、定时任务被注册、重复触发幂等。",
       "status": "done",
-      "committed_sha": "PENDING"
+      "committed_sha": "491a615"
     },
     {
       "id": 14,
       "title": "WebSocket 实时通信",
       "plan": "为博客加文章直播评论：WS /ws/posts/{post_id}/comments，连接时进入 ConnectionManager 的房间；客户端发 JSON 评论消息后广播给房间内所有人；心跳 ping/pong；断线清理。docs/lessons/14-websocket.md。tests/test_14_websocket.py 至 least 8 条：连接成功、发消息后回执、广播给其他客户端、本人也能收到、断开后他人收到 leave、JSON 协议解析、心跳响应、房间隔离（不同 post_id 不互通）。",
-      "status": "todo"
+      "status": "done",
+      "committed_sha": "PENDING"
     },
     {
       "id": 15,

@@ -31,6 +31,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.auth import get_current_jwt_author
 from app.api.auth import router as auth_router
+from app.api.ws_comments import router as ws_router
 from app.core.deps import get_current_active_author, get_db
 from app.core.exceptions import PostNotFound
 from app.crud import create_post as crud_create_post
@@ -67,6 +68,9 @@ register_exception_handlers(app)
 
 # task-12：挂载认证路由（/auth/register, /auth/token）
 app.include_router(auth_router)
+
+# task-14：挂载 WebSocket 路由（/ws/posts/{id}/comments）
+app.include_router(ws_router)
 
 
 # task-12：/me 端点（JWT 依赖）
