@@ -1,8 +1,8 @@
 {
   "goal": "制作一套 Python FastAPI 从入门到精通的完整教学内容（面向通用读者，文档分层标注难度），使用最新稳定版（FastAPI 0.115+ / Pydantic 2.x / SQLAlchemy 2.x），所有 20 个 task 共同构建同一个渐进式博客系统：从 task-1 的项目骨架开始，每个 task 引入一个新知识点并扩展博客功能，最终在 task-20 汇成完整的博客 API（文章/作者/评论/标签/统计），每个案例配教学文档 + 可运行源码 + ≥8 条 pytest 测试",
   "total": 20,
-  "completed": 1,
-  "rounds": 1,
+  "completed": 2,
+  "rounds": 2,
   "max_rounds": 120,
   "project_storyline": "渐进式构建一个博客系统 API。task-1 搭骨架，task-2~16 每步引入一个 FastAPI 知识点扩展功能，task-17~19 完成工程化（结构/缓存/部署），task-20 整合验收。最终交付完整可运行博客系统。",
   "conventions": {
@@ -26,7 +26,8 @@
       "id": 2,
       "title": "路径参数、查询参数与枚举",
       "plan": "扩展博客文章接口：GET /posts 支持查询参数 ?limit=10&offset=0&published=true&status=published；GET /posts/{post_id} 的 post_id 强制 int（错误返回 422）；GET /users/{username} 支持 str 路径；新增 Enum PostStatus（draft/published/archived），传入非法枚举值返回 422。讲解 Path/Query/Enum/默认值/可选参数/Annotated 风格。docs/lessons/02-params.md。tests/test_02_params.py 至少 8 条：limit 默认值、limit+offset 分页、published 过滤、status 枚举合法值、status 非法值 422、post_id 非法 int、username 路径 str、组合查询参数。",
-      "status": "todo"
+      "status": "done",
+      "committed_sha": "8130c47"
     },
     {
       "id": 3,

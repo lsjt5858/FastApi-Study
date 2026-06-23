@@ -15,6 +15,7 @@ from typing import Annotated
 from fastapi import FastAPI, HTTPException, Query
 
 from app.schemas.enums import PostStatus
+from app.schemas.post import PostCreate
 
 app = FastAPI(
     title="Blog API",
@@ -95,6 +96,21 @@ def get_post(post_id: int) -> dict:
         if post["id"] == post_id:
             return post
     raise HTTPException(status_code=404, detail="Post not found")
+
+
+@app.post("/posts", status_code=201)
+def create_post(payload: PostCreate) -> dict:
+    """创建文章。task-3 阶段仅写入内存 POSTS。
+
+    后续 task 会：
+    - task-5 用 response_model=PostOut 过滤敏感字段
+    - task-6 加依赖注入（当前作者）
+    - task-11 替换内存 POSTS 为 SQLAlchemy
+    """
+    new_id = (max(p["id"] for p in POSTS) + 1) if POSTS else 1
+    post = {"id": new_id, **payload.model_dump(by_alias=False)}
+    POSTS.append(post)
+    return post
 
 
 @app.get("/users/{username}")
