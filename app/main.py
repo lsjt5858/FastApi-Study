@@ -10,9 +10,11 @@
 
 from __future__ import annotations
 
+import asyncio
 from typing import Annotated
 
 from fastapi import (
+    BackgroundTasks,
     Cookie,
     Depends,
     FastAPI,
@@ -31,6 +33,8 @@ from app.data import POSTS, USERS
 from app.schemas.author import AuthorCreate
 from app.schemas.enums import PostStatus
 from app.schemas.post import PostCreate, PostOut
+from app.services.external import blocking_cpu_task
+from app.services.stats import aggregate_with_gather
 from app.services.upload import validate_and_read
 
 app = FastAPI(
@@ -232,3 +236,98 @@ async def upload_covers(
         data = await validate_and_read(f)
         sizes.append({"filename": f.filename, "size": len(data)})
     return {"post_id": post_id, "count": len(files), "files": sizes, "alt_text": alt_text}
+
+
+# ---------- task-8：异步统计聚合 ----------
+
+
+async def get_async_client() -> dict:
+    """async 依赖演示：在 async 函数里返回模拟的 httpx client。"""
+    return {"client": "async-httpx-client", "id": id(object())}
+
+
+# 模块级事件日志：观察 async generator 依赖的 setup/teardown 时序
+# （route 在 yield 阶段返回响应时，teardown 还没跑；只能在请求结束后从外部观察）
+_CTX_EVENTS: list[str] = []
+
+
+async def async_resource():
+    """async generator 依赖：FastAPI 直接支持 async generator（yield 自动转 finally 清理）。
+
+    注意：contextlib.asynccontextmanager 装饰出的对象是 _AsyncGeneratorContextManager，
+    不能直接当 FastAPI 依赖用（Depends 不会进入 context）。
+    FastAPI 原生支持 async generator 函数：yield 前面是 setup，yield 之后是 teardown。
+    teardown 在响应序列化之后执行，所以 route 返回时 exited 仍是 False；
+    要观察 teardown，需读取模块级 _CTX_EVENTS。
+    """
+    _CTX_EVENTS.clear()
+    _CTX_EVENTS.append("entered")
+    state = {"entered": True, "exited": False}
+    try:
+        yield state
+    finally:
+        state["exited"] = True
+        _CTX_EVENTS.append("exited")
+
+
+@app.get("/stats/aggregate/{post_id}")
+async def stats_aggregate(post_id: int) -> dict:
+    """async 并发聚合 3 个外部服务，演示 asyncio.gather。"""
+    views, comments, likes, elapsed_ms = await aggregate_with_gather(post_id)
+    return {
+        "post_id": post_id,
+        "views": views,
+        "comments": comments,
+        "likes": likes,
+        "elapsed_ms": round(elapsed_ms, 1),
+    }
+
+
+@app.get("/stats/aggregate-sync/{post_id}")
+def stats_aggregate_sync(post_id: int) -> dict:
+    """对比演示：同步串行版本，总耗时 = sum（每个 sleep 累加）。
+
+    在生产 async 应用里写这种接口会阻塞整个 worker。
+    """
+    import time as _t
+
+    _t.sleep(0.05)
+    views = 1234
+    _t.sleep(0.05)
+    comments = 56
+    _t.sleep(0.05)
+    likes = 789
+    return {"post_id": post_id, "views": views, "comments": comments, "likes": likes}
+
+
+@app.get("/stats/async-dep")
+async def stats_async_dep(client: Annotated[dict, Depends(get_async_client)]) -> dict:
+    """演示 async 依赖。"""
+    return {"client": client["client"]}
+
+
+@app.post("/stats/trigger-background", status_code=202)
+async def stats_trigger_background(background_tasks: BackgroundTasks) -> dict:
+    """演示 BackgroundTasks 与 async 路由配合。"""
+    background_tasks.add_task(lambda: None)  # 占位任务
+    return {"scheduled": True}
+
+
+@app.get("/stats/blocking-via-executor")
+async def stats_blocking_via_executor(n: int = 10) -> dict:
+    """演示：阻塞任务用 run_in_executor 委托线程池。"""
+    loop = asyncio.get_running_loop()
+    result = await loop.run_in_executor(None, blocking_cpu_task, n)
+    return {"n": n, "result": result}
+
+
+@app.get("/stats/with-ctx")
+async def stats_with_ctx(
+    state: Annotated[dict, Depends(async_resource)],
+) -> dict:
+    """演示：async context manager 依赖。
+
+    响应序列化时 teardown 还没跑，所以响应里 exited 必然是 False；
+    要观察 teardown 是否真的执行了，看模块级 _CTX_EVENTS（测试在请求结束后断言它）。
+    """
+    return {"entered": state["entered"], "exited": state["exited"]}
