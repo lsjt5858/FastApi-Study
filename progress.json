@@ -1,8 +1,8 @@
 {
   "goal": "制作一套 Python FastAPI 从入门到精通的完整教学内容（面向通用读者，文档分层标注难度），使用最新稳定版（FastAPI 0.115+ / Pydantic 2.x / SQLAlchemy 2.x），所有 20 个 task 共同构建同一个渐进式博客系统：从 task-1 的项目骨架开始，每个 task 引入一个新知识点并扩展博客功能，最终在 task-20 汇成完整的博客 API（文章/作者/评论/标签/统计），每个案例配教学文档 + 可运行源码 + ≥8 条 pytest 测试",
   "total": 20,
-  "completed": 17,
-  "rounds": 17,
+  "completed": 18,
+  "rounds": 18,
   "max_rounds": 120,
   "project_storyline": "渐进式构建一个博客系统 API。task-1 搭骨架，task-2~16 每步引入一个 FastAPI 知识点扩展功能，task-17~19 完成工程化（结构/缓存/部署），task-20 整合验收。最终交付完整可运行博客系统。",
   "conventions": {
@@ -138,7 +138,8 @@
       "id": 18,
       "title": "缓存集成 Redis",
       "plan": "为博客文章列表加 Redis 缓存：services/cache.py 异步 redis-py 客户端；GET /posts 先查 cache（key=post:list:{hash}）命中直接返回，否则查 DB 后回填 TTL=60s；POST/UPDATE/DELETE 主动失效；缓存击穿用 asyncio.Lock 单飞；空值缓存防穿透；缓存异常降级到 DB。docs/lessons/18-cache.md。tests/test_18_cache.py 至 least 8 条：首次查 DB、二次查缓存、TTL 过期回源、主动失效、并发单飞（多个请求只查一次 DB）、空值缓存防穿透、键命名隔离不同分页、Redis 异常时降级不报错。",
-      "status": "todo"
+      "status": "done",
+      "committed_sha": "402fb56"
     },
     {
       "id": 19,
