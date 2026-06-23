@@ -1,15 +1,16 @@
-"""task-3 引入：请求体模型 PostCreate / PostMeta。
-
-用 Pydantic v2 风格：
-- model_config = ConfigDict(...) 替代 v1 的 class Config
-- model_dump() 替代 v1 的 dict()
-- Field(min_length=..., max_length=...) 做字段约束
-- 通过 AliasChoices 让 tags 同时接受 "tags" 和 "keywords" 两种输入名
-"""
-
 from __future__ import annotations
 
-from pydantic import AliasChoices, BaseModel, ConfigDict, Field
+import re
+
+from pydantic import (
+    AliasChoices,
+    BaseModel,
+    ConfigDict,
+    Field,
+    computed_field,
+    field_validator,
+    model_validator,
+)
 
 from app.schemas.author import AuthorOut
 from app.schemas.enums import PostStatus
@@ -23,13 +24,29 @@ class PostMeta(BaseModel):
     cover_color: str = "#ffffff"
 
 
+def _normalize_tags(tags: list[str]) -> list[str]:
+    """去重 + 小写化，保持首次出现顺序。"""
+    seen: list[str] = []
+    for t in tags:
+        tl = t.lower()
+        if tl not in seen:
+            seen.append(tl)
+    return seen
+
+
+def _title_to_slug(title: str) -> str:
+    """把 title 转成 URL 友好的 slug。"""
+    return re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")
+
+
 class PostCreate(BaseModel):
     """创建文章的请求体模型。
 
-    - title 长度约束 1~200
-    - tags 同时接受 'tags' 和 'keywords' 两种字段名（AliasChoices）
-    - extra='ignore' 让未知字段被静默丢弃
-    - status 由后端控制，请求体不暴露（用户不能自己改文章状态）
+    task-7 强化：
+    - title 自动 strip
+    - tags 去重 + 小写
+    - slug 由 title 自动生成（model_validator）
+    - excerpt 由 content 前 50 字自动生成（computed_field）
     """
 
     model_config = ConfigDict(extra="ignore", populate_by_name=True)
@@ -43,6 +60,29 @@ class PostCreate(BaseModel):
     metadata: PostMeta | None = None
     published: bool = False
     status: PostStatus = PostStatus.draft
+    slug: str = ""  # 由 model_validator 自动填充
+
+    @field_validator("title")
+    @classmethod
+    def strip_title(cls, v: str) -> str:
+        return v.strip()
+
+    @field_validator("tags")
+    @classmethod
+    def normalize_tags(cls, v: list[str]) -> list[str]:
+        return _normalize_tags(v)
+
+    @model_validator(mode="after")
+    def generate_slug(self) -> PostCreate:
+        # 仅当用户未显式传 slug 时自动生成
+        if not self.slug:
+            self.slug = _title_to_slug(self.title)
+        return self
+
+    @computed_field
+    @property
+    def excerpt(self) -> str:
+        return self.content[:50]
 
 
 class PostOut(BaseModel):
@@ -64,3 +104,9 @@ class PostOut(BaseModel):
     tags: list[str] = Field(default_factory=list)
     metadata: PostMeta | None = None
     author: AuthorOut | None = None
+    slug: str = ""
+
+    @computed_field
+    @property
+    def excerpt(self) -> str:
+        return self.content[:50]

@@ -28,6 +28,7 @@ from fastapi.responses import JSONResponse
 
 from app.core.deps import get_current_active_author, get_db
 from app.data import POSTS, USERS
+from app.schemas.author import AuthorCreate
 from app.schemas.enums import PostStatus
 from app.schemas.post import PostCreate, PostOut
 from app.services.upload import validate_and_read
@@ -164,6 +165,19 @@ def delete_post(
         status_code=404,
         content={"error": {"code": "POST_NOT_FOUND", "message": "Not found"}},
     )
+
+
+@app.post("/authors/preview")
+def preview_author(payload: AuthorCreate) -> dict:
+    """task-7 新增：演示 AuthorCreate 校验（email lower / phone 自定义类型）。
+
+    task-12 会替换为真正的 /auth/register 接口。
+    """
+    return {
+        "username": payload.username,
+        "email": payload.email,
+        "phone": payload.phone,
+    }
 
 
 @app.get("/users/{username}")
