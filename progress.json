@@ -125,7 +125,7 @@
       "title": "测试体系 TestClient + Fixture",
       "plan": "把博客测试重构为体系化测试：conftest.py 提供 client/db_session/current_author 三个 fixture；用 dependency_overrides 替换 db；httpx.AsyncClient 测异步路径；pytest.mark.parametrize 参数化列表接口；mock 外部邮件服务。docs/lessons/16-testing.md。tests/test_16_blog_fixtures.py 至 least 8 条：fixture 被复用、dependency_overrides 替换 db、参数化测试覆盖分页、mock 邮件服务、tmp_path 持久化测试、async 测试用 anyio、覆盖率统计（pytest-cov）、测试隔离（每个用例独立 db）。",
       "status": "done",
-      "committed_sha": "PENDING"
+      "committed_sha": "a8acd18"
     },
     {
       "id": 17,

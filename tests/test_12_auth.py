@@ -115,7 +115,11 @@ def test_me_with_expired_token_401(auth_client) -> None:
     from app.core.security import create_access_token
 
     # exp 设成过去时间
-    token = create_access_token(subject="1", expires_minutes=-10, secret=settings.SECRET_KEY)
+    token = create_access_token(
+        subject="1",
+        expires_minutes=-10,
+        secret=settings.SECRET_KEY.get_secret_value(),
+    )
     r = auth_client.get("/me", headers={"Authorization": f"Bearer {token}"})
     assert r.status_code == 401
 

@@ -67,7 +67,7 @@ async def login(
     token = create_access_token(
         subject=str(author.id),
         expires_minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES,
-        secret=settings.SECRET_KEY,
+        secret=settings.SECRET_KEY.get_secret_value(),
     )
     return TokenResponse(access_token=token)
 
@@ -82,7 +82,7 @@ async def get_current_jwt_author(
     """
     if not token:
         raise HTTPException(status_code=401, detail="Not authenticated")
-    payload = decode_token(token, settings.SECRET_KEY)
+    payload = decode_token(token, settings.SECRET_KEY.get_secret_value())
     sub = payload.get("sub")
     if sub is None:
         raise HTTPException(status_code=401, detail="Invalid token payload")
