@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 
+from app.schemas.author import AuthorOut
 from app.schemas.enums import PostStatus
 
 
@@ -42,3 +43,24 @@ class PostCreate(BaseModel):
     metadata: PostMeta | None = None
     published: bool = False
     status: PostStatus = PostStatus.draft
+
+
+class PostOut(BaseModel):
+    """文章对外响应模型。
+
+    与 PostCreate 的区别：
+    - 多了 id / author
+    - 没有 is_deleted（即使内部 dict 里有，也被过滤）
+    - author 嵌套 AuthorOut，过滤 password 等敏感字段
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    title: str
+    content: str
+    published: bool = False
+    status: PostStatus = PostStatus.draft
+    tags: list[str] = Field(default_factory=list)
+    metadata: PostMeta | None = None
+    author: AuthorOut | None = None
