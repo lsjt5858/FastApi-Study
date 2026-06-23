@@ -55,7 +55,7 @@ def test_email_lowercased() -> None:
     """POST /authors/preview: User@Example.COM → user@example.com。"""
     resp = client.post(
         "/authors/preview",
-        json={"username": "Alice", "email": "User@Example.COM"},
+        json={"username": "Alice", "email": "User@Example.COM", "password": "password123"},
     )
     assert resp.status_code == 200
     body = resp.json()
@@ -88,7 +88,7 @@ def test_optional_field_skipped() -> None:
     """Optional 字段（phone）为 None 时不触发校验。"""
     resp = client.post(
         "/authors/preview",
-        json={"username": "X", "email": "x@y.com"},  # 不传 phone
+        json={"username": "X", "email": "x@y.com", "password": "password123"},  # 不传 phone
     )
     assert resp.status_code == 200
     assert resp.json()["phone"] is None
@@ -98,7 +98,12 @@ def test_valid_phone_number_accepted() -> None:
     """合法手机号 → 200。"""
     resp = client.post(
         "/authors/preview",
-        json={"username": "X", "email": "x@y.com", "phone": "+8613800138000"},
+        json={
+            "username": "X",
+            "email": "x@y.com",
+            "phone": "+8613800138000",
+            "password": "password123",
+        },
     )
     assert resp.status_code == 200
     assert resp.json()["phone"] == "+8613800138000"

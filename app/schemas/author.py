@@ -38,6 +38,7 @@ class AuthorCreate(BaseModel):
     username: str = Field(min_length=1, max_length=50)
     email: str
     phone: PhoneNumber | None = None
+    password: str = Field(min_length=8, max_length=128)
 
     @field_validator("email")
     @classmethod

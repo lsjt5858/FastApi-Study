@@ -18,6 +18,7 @@ class Author(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     username: Mapped[str] = mapped_column(String(50), unique=True, index=True)
     email: Mapped[str] = mapped_column(String(200))
+    hashed_password: Mapped[str] = mapped_column(String(200), default="")
 
     if TYPE_CHECKING:
         posts: list[Post]

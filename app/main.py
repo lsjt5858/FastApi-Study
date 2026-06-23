@@ -29,6 +29,8 @@ from fastapi import (
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.auth import get_current_jwt_author
+from app.api.auth import router as auth_router
 from app.core.deps import get_current_active_author, get_db
 from app.core.exceptions import PostNotFound
 from app.crud import create_post as crud_create_post
@@ -38,7 +40,7 @@ from app.crud import list_posts as crud_list_posts
 from app.data import POSTS, USERS
 from app.db import get_async_db
 from app.models import Post
-from app.schemas.author import AuthorCreate
+from app.schemas.author import AuthorCreate, AuthorOut
 from app.schemas.enums import PostStatus
 from app.schemas.post import PostCreate, PostOut
 from app.services.external import blocking_cpu_task
@@ -61,6 +63,19 @@ register_middleware(app)
 from app.core.exceptions import register_exception_handlers  # noqa: E402
 
 register_exception_handlers(app)
+
+# task-12：挂载认证路由（/auth/register, /auth/token）
+app.include_router(auth_router)
+
+
+# task-12：/me 端点（JWT 依赖）
+@app.get("/me", response_model=AuthorOut)
+async def me(
+    author: Annotated[dict, Depends(get_current_jwt_author)],
+) -> dict:
+    """返回当前 JWT 持有者。无 token / 过期 / 伪造 -> 401。"""
+    return {"id": author.id, "username": author.username, "display_name": None}
+
 
 # 数据层在 app.data，main.py 通过 import 引用（避免与 core/deps.py 循环 import）
 
