@@ -1,8 +1,8 @@
 {
   "goal": "制作一套 Python FastAPI 从入门到精通的完整教学内容（面向通用读者，文档分层标注难度），使用最新稳定版（FastAPI 0.115+ / Pydantic 2.x / SQLAlchemy 2.x），所有 20 个 task 共同构建同一个渐进式博客系统：从 task-1 的项目骨架开始，每个 task 引入一个新知识点并扩展博客功能，最终在 task-20 汇成完整的博客 API（文章/作者/评论/标签/统计），每个案例配教学文档 + 可运行源码 + ≥8 条 pytest 测试",
   "total": 20,
-  "completed": 16,
-  "rounds": 16,
+  "completed": 17,
+  "rounds": 17,
   "max_rounds": 120,
   "project_storyline": "渐进式构建一个博客系统 API。task-1 搭骨架，task-2~16 每步引入一个 FastAPI 知识点扩展功能，task-17~19 完成工程化（结构/缓存/部署），task-20 整合验收。最终交付完整可运行博客系统。",
   "conventions": {
@@ -131,7 +131,8 @@
       "id": 17,
       "title": "项目结构与分层架构",
       "plan": "把所有博客代码按生产项目结构重组：app/{api/routers/{posts,users,comments,auth}, core/{config,security,deps}, crud/, models/, schemas/, services/, main.py}；pydantic-settings 管理 Settings（DATABASE_URL/SECRET_KEY/DEBUG）；routers include_router 聚合。docs/lessons/17-structure.md。tests/test_17_structure.py 至 least 8 条：Settings 加载默认值、环境变量覆盖 Settings、SECRET_KEY 不在 OpenAPI 暴露、routers 注册计数、跨模块依赖 author→post、Settings 单例、不同 env 文件切换、配置类型校验失败抛错。",
-      "status": "todo"
+      "status": "done",
+      "committed_sha": "1328153"
     },
     {
       "id": 18,
