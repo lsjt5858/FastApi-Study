@@ -429,8 +429,12 @@ async def db_create_post(
 
     task-13：创建成功后用 BackgroundTasks 异步触发"欢迎邮件"，
     响应不会被邮件发送阻塞。
+
+    task-18：创建后主动失效列表缓存（pattern=post:list:*）。
     """
     from sqlalchemy.exc import IntegrityError
+
+    from app.services.cache import cache_invalidate_pattern
 
     try:
         post = await crud_create_post(db, title=payload.title, content=payload.content)
@@ -438,6 +442,8 @@ async def db_create_post(
         raise BizDuplicate from exc
     # 邮件发送在响应之后才跑
     background_tasks.add_task(send_welcome_email, "author@example.com", post.title)
+    # 失效列表缓存（task-18）
+    await cache_invalidate_pattern("post:list:*")
     return _post_to_dict(post)
 
 
@@ -447,9 +453,34 @@ async def db_list_posts(
     limit: Annotated[int, Query(ge=1, le=100)] = 10,
     offset: Annotated[int, Query(ge=0)] = 0,
 ) -> list[dict]:
-    """列表（DB）。"""
-    items = await crud_list_posts(db, limit=limit, offset=offset)
-    return [_post_to_dict(p) for p in items]
+    """列表（DB）+ Redis 缓存（task-18）。
+
+    流程：
+    1. cache_get(post:list:{limit}:{offset}) 命中 → 直接返回
+    2. miss → 加单飞锁 → 双检（防别人刚回填）→ 查 DB → 回填缓存 TTL=60s
+
+    - 单飞：并发同 key 请求只触发一次 DB 查询
+    - 空值也缓存：防穿透（命中空列表直接返回）
+    - Redis 不可用：cache_get / cache_set 内部吞掉异常，自动降级到 DB
+    """
+    from app.services.cache import cache_get, cache_set, get_single_flight_lock
+
+    cache_key = f"post:list:{limit}:{offset}"
+
+    hit, cached = await cache_get(cache_key)
+    if hit:
+        return cached
+
+    lock = await get_single_flight_lock(cache_key)
+    async with lock:
+        # 拿到锁后再查一次缓存：前面排队的人可能已经把结果填回去了
+        hit, cached = await cache_get(cache_key)
+        if hit:
+            return cached
+        items = await crud_list_posts(db, limit=limit, offset=offset)
+        result = [_post_to_dict(p) for p in items]
+        await cache_set(cache_key, result, ttl=60)
+        return result
 
 
 @app.get("/db/posts/{post_id}", response_model=PostOut)
@@ -469,10 +500,16 @@ async def db_delete_post(
     post_id: int,
     db: Annotated[AsyncSession, Depends(get_async_db)],
 ) -> None:
-    """删除（DB）。不存在 -> 404 POST_NOT_FOUND。"""
+    """删除（DB）。不存在 -> 404 POST_NOT_FOUND。
+
+    task-18：删除后主动失效列表缓存。
+    """
+    from app.services.cache import cache_invalidate_pattern
+
     deleted = await crud_delete_post(db, post_id)
     if not deleted:
         raise PostNotFound(post_id=post_id)
+    await cache_invalidate_pattern("post:list:*")
     return None
 
 
