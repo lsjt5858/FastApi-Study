@@ -49,6 +49,11 @@ from app.core.middleware import register_middleware  # noqa: E402
 
 register_middleware(app)
 
+# task-10：注册全局异常处理器（BizError / RequestValidationError / Exception 兜底）
+from app.core.exceptions import register_exception_handlers  # noqa: E402
+
+register_exception_handlers(app)
+
 # 数据层在 app.data，main.py 通过 import 引用（避免与 core/deps.py 循环 import）
 
 
