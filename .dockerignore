@@ -1,0 +1,53 @@
+# 本地虚拟环境
+.venv/
+venv/
+env/
+
+# 缓存
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# 真实配置（绝不进镜像）
+.env
+.env.local
+.env.*.local
+
+# 开发/构建产物
+blog.db
+blog.db-journal
+*.log
+dist/
+build/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Docker 自身（避免递归 COPY）
+Dockerfile
+.dockerignore
+docker-compose.yml
+docker-compose.*.yml
+
+# CI
+.github/
+.gitlab-ci.yml
+
+# 文档（按需保留 docs/，剔除 .md 临时笔记）
+NOTES.md
+TODO.md
