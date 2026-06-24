@@ -1,8 +1,8 @@
 {
   "goal": "制作一套 Python FastAPI 从入门到精通的完整教学内容（面向通用读者，文档分层标注难度），使用最新稳定版（FastAPI 0.115+ / Pydantic 2.x / SQLAlchemy 2.x），所有 20 个 task 共同构建同一个渐进式博客系统：从 task-1 的项目骨架开始，每个 task 引入一个新知识点并扩展博客功能，最终在 task-20 汇成完整的博客 API（文章/作者/评论/标签/统计），每个案例配教学文档 + 可运行源码 + ≥8 条 pytest 测试",
   "total": 20,
-  "completed": 19,
-  "rounds": 19,
+  "completed": 20,
+  "rounds": 20,
   "max_rounds": 120,
   "project_storyline": "渐进式构建一个博客系统 API。task-1 搭骨架，task-2~16 每步引入一个 FastAPI 知识点扩展功能，task-17~19 完成工程化（结构/缓存/部署），task-20 整合验收。最终交付完整可运行博客系统。",
   "conventions": {
@@ -152,7 +152,8 @@
       "id": 20,
       "title": "综合实战：博客系统端到端",
       "plan": "把前 19 个知识点串成完整博客系统并跑端到端：用户注册→登录→发文章（标题自动 slug、标签去重、Pydantic 校验）→上传封面→他人评论→WebSocket 直播→收藏→阅读量异步聚合→缓存命中→管理员删除违规文章→定时统计热门。docs/lessons/20-blog-final.md 写一篇架构总览 + 模块关系图 + 性能/安全/可观测性 checklist。tests/test_20_blog_e2e.py 至 least 8 条端到端：注册→登录、登录后发文章、文章 404、他人可评论、评论触发 WebSocket 广播、列表缓存命中、统计接口聚合数据、管理员 scope 才能删除。",
-      "status": "todo"
+      "status": "done",
+      "committed_sha": "c7a2d74"
     }
   ]
 }
