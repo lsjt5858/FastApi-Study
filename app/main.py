@@ -44,7 +44,7 @@ from app.db import get_async_db
 from app.models import Post
 from app.schemas.author import AuthorCreate, AuthorOut
 from app.schemas.enums import PostStatus
-from app.schemas.post import PostCreate, PostOut
+from app.schemas.post import PostCreate, PostOut, _title_to_slug
 from app.services.email import send_welcome_email
 from app.services.external import blocking_cpu_task
 from app.services.stats import aggregate_with_gather
@@ -105,6 +105,11 @@ app.include_router(auth_router)
 
 # task-14：挂载 WebSocket 路由（/ws/posts/{id}/comments）
 app.include_router(ws_router)
+
+# task-20：挂载管理员 scope 路由（/admin/posts/{id}）
+from app.api.admin import router as admin_router  # noqa: E402
+
+app.include_router(admin_router)
 
 # task-15：API 版本化（v1 / v2 共存）
 app.include_router(v1_router)
@@ -514,13 +519,17 @@ async def db_delete_post(
 
 
 def _post_to_dict(post: Post) -> dict:
-    """ORM model -> dict（response_model=PostOut 会二次校验）。"""
+    """ORM model -> dict（response_model=PostOut 会二次校验）。
+
+    task-20：slug 由 title 派生（与 PostCreate.generate_slug 保持一致），
+    让 DB 版端点的响应也能携带对外的 slug 字段。
+    """
     return {
         "id": post.id,
         "title": post.title,
         "content": post.content,
         "tags": [],
-        "slug": "",
+        "slug": _title_to_slug(post.title),
     }
 
 
