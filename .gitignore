@@ -11,3 +11,14 @@ htmlcov/
 build/
 dist/
 *.egg-info/
+
+# AI assistant local rules/config
+.trae/rules/
+.claude/
+.cursor/rules/
+.windsurf/rules/
+.claude/
+.cursor/rules/
+.goal/
+.trae/
+.ruff_cache/
