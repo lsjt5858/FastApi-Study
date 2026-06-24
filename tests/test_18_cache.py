@@ -135,6 +135,27 @@ def test_invalidate_on_create(db_client, monkeypatch) -> None:
     assert "before" in titles and "after" in titles
 
 
+def test_invalidate_on_update(db_client, monkeypatch) -> None:
+    """PUT /db/posts/{id} 主动失效缓存：再次 list 应看到新标题。"""
+    calls = _patch_list_calls(monkeypatch)
+    post_id = _create_post(db_client, title="before-update", content="old")
+
+    db_client.get("/db/posts")
+    assert calls["n"] == 1
+
+    r = db_client.put(
+        f"/db/posts/{post_id}",
+        json={"title": "after-update", "content": "new"},
+    )
+    assert r.status_code == 200
+
+    refreshed = db_client.get("/db/posts")
+    assert calls["n"] == 2, "PUT 后缓存失效，再次 list 应查 DB"
+    titles = [p["title"] for p in refreshed.json()]
+    assert "after-update" in titles
+    assert "before-update" not in titles
+
+
 def test_different_pagination_keys_isolated(db_client, monkeypatch) -> None:
     """不同 limit/offset 用不同 cache key，互不影响。"""
     calls = _patch_list_calls(monkeypatch)

@@ -18,7 +18,7 @@
 - [ ] async engine（sqlite+aiosqlite）+ async_sessionmaker
 - [ ] Author 与 Post 一对多关系
 - [ ] get_db 改为 async generator（yield AsyncSession）
-- [ ] POST/GET/PUT/DELETE 走真实数据库
+- [ ] POST/GET/PUT/DELETE 走真实数据库，其中 `PUT /db/posts/{id}` 更新 title/content
 - [ ] 事务回滚生效
 - [ ] 测试每个用例独立内存库（fixture）
 - [ ] 8 条测试全绿
@@ -26,7 +26,7 @@
 ## 测试点（至少 8 条）
 1. `test_create_post_persisted`：创建后能查到
 2. `test_list_posts_from_db`：列表来自 DB
-3. `test_update_post`：更新生效
+3. `test_update_post`：`PUT /db/posts/{id}` 更新 title/content 后，详情接口返回新内容
 4. `test_delete_post`：删除后 404
 5. `test_get_post_not_found_404`：不存在 ID 404
 6. `test_title_unique_constraint`：title 重复抛 IntegrityError
@@ -81,6 +81,15 @@ async def create_post(db: AsyncSession, data: dict) -> Post:
 async def list_posts(db: AsyncSession) -> list[Post]:
     result = await db.execute(select(Post))
     return result.scalars().all()
+
+async def update_post(db: AsyncSession, post_id: int, data: dict) -> Post | None:
+    post = await get_post(db, post_id)
+    if post is None:
+        return None
+    post.title = data["title"]
+    post.content = data["content"]
+    await db.flush()
+    return post
 ```
 - 测试用 in-memory sqlite：`create_async_engine("sqlite+aiosqlite:///:memory:")` + per-test fixture
 - 用 `mapped_column(String(200), unique=True)` 加约束

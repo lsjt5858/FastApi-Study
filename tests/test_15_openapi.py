@@ -51,6 +51,12 @@ def test_responses_has_422_for_create() -> None:
     assert "422" in op["responses"]
 
 
+def test_openapi_has_put_for_db_post_update() -> None:
+    """OpenAPI 应包含 PUT /db/posts/{post_id} 更新接口。"""
+    spec = client.get("/openapi.json").json()
+    assert "put" in spec["paths"]["/db/posts/{post_id}"]
+
+
 def test_v1_v2_routes_both_exist() -> None:
     """/api/v1/posts 与 /api/v2/posts 都可访问。"""
     r1 = client.get("/api/v1/posts")

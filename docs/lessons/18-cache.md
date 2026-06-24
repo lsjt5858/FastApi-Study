@@ -97,6 +97,12 @@ async def create_post(...):
     await cache_invalidate_pattern("post:list:*")  # 清所有列表缓存
     return post
 
+@app.put("/db/posts/{id}")
+async def update_post(...):
+    post = await db_update(...)
+    await cache_invalidate_pattern("post:list:*")
+    return post
+
 @app.delete("/db/posts/{id}")
 async def delete_post(...):
     await db_delete(...)
@@ -193,6 +199,6 @@ def cache_client(monkeypatch):
 - 新增 `app/services/cache.py`：`get_cache / cache_get / cache_set / cache_invalidate_pattern / get_single_flight_lock`
 - 更新 `app/main.py`：
   - `GET /db/posts` 加 cache + 单飞锁 + 双检
-  - `POST /db/posts` / `DELETE /db/posts/{id}` 触发 `cache_invalidate_pattern`
+  - `POST /db/posts` / `PUT /db/posts/{id}` / `DELETE /db/posts/{id}` 触发 `cache_invalidate_pattern`
 - 新增 `tests/test_18_cache.py`：8 条覆盖 miss/hit/失效/单飞/穿透/降级/TTL/键隔离
 - `pyproject.toml` 依赖加 `redis` + `fakeredis`

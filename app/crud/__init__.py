@@ -35,6 +35,21 @@ async def get_post(db: AsyncSession, post_id: int) -> Post | None:
     return result.scalar_one_or_none()
 
 
+async def update_post(db: AsyncSession, post_id: int, title: str, content: str) -> Post | None:
+    """更新文章；不存在返回 None，title 重复时抛 IntegrityError。"""
+    post = await get_post(db, post_id)
+    if post is None:
+        return None
+    post.title = title
+    post.content = content
+    try:
+        await db.flush()
+    except IntegrityError:
+        await db.rollback()
+        raise
+    return post
+
+
 async def delete_post(db: AsyncSession, post_id: int) -> bool:
     """删除；返回是否真的删了一条。"""
     post = await get_post(db, post_id)

@@ -223,6 +223,7 @@ Docker 镜像中已经在构建阶段安装了 `gunicorn`。
 | `POST` | `/db/posts` | 数据库版文章创建 |
 | `GET` | `/db/posts` | 数据库版文章列表，带 Redis 缓存示例 |
 | `GET` | `/db/posts/{post_id}` | 数据库版文章详情 |
+| `PUT` | `/db/posts/{post_id}` | 数据库版文章更新 |
 | `DELETE` | `/db/posts/{post_id}` | 数据库版文章删除 |
 | `DELETE` | `/admin/posts/{post_id}` | admin scope 删除文章 |
 | `GET` | `/stats/aggregate/{post_id}` | 异步并发聚合统计 |

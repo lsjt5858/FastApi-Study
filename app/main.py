@@ -39,6 +39,7 @@ from app.crud import create_post as crud_create_post
 from app.crud import delete_post as crud_delete_post
 from app.crud import get_post as crud_get_post
 from app.crud import list_posts as crud_list_posts
+from app.crud import update_post as crud_update_post
 from app.data import POSTS, USERS
 from app.db import get_async_db
 from app.models import Post
@@ -497,6 +498,30 @@ async def db_get_post(
     post = await crud_get_post(db, post_id)
     if post is None:
         raise PostNotFound(post_id=post_id)
+    return _post_to_dict(post)
+
+
+@app.put("/db/posts/{post_id}", response_model=PostOut)
+async def db_update_post(
+    post_id: int,
+    payload: PostCreate,
+    db: Annotated[AsyncSession, Depends(get_async_db)],
+) -> dict:
+    """更新（DB）。不存在 -> 404；title 重复 -> 409。
+
+    task-18：更新后主动失效列表缓存。
+    """
+    from sqlalchemy.exc import IntegrityError
+
+    from app.services.cache import cache_invalidate_pattern
+
+    try:
+        post = await crud_update_post(db, post_id, title=payload.title, content=payload.content)
+    except IntegrityError as exc:
+        raise BizDuplicate from exc
+    if post is None:
+        raise PostNotFound(post_id=post_id)
+    await cache_invalidate_pattern("post:list:*")
     return _post_to_dict(post)
 
 

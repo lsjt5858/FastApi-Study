@@ -89,6 +89,35 @@ def test_get_post_by_id(db_client) -> None:
     assert r.json()["title"] == "GetX"
 
 
+def test_update_post_persists_changes(db_client) -> None:
+    """PUT /db/posts/{id} 更新文章后，详情接口返回新内容。"""
+    created = db_client.post("/db/posts", json={"title": "Before", "content": "old"}).json()
+
+    r = db_client.put(
+        f"/db/posts/{created['id']}",
+        json={"title": "After", "content": "new"},
+    )
+
+    assert r.status_code == 200
+    body = r.json()
+    assert body["id"] == created["id"]
+    assert body["title"] == "After"
+    assert body["content"] == "new"
+
+    detail = db_client.get(f"/db/posts/{created['id']}")
+    assert detail.status_code == 200
+    assert detail.json()["title"] == "After"
+    assert detail.json()["content"] == "new"
+
+
+def test_update_post_not_found_404(db_client) -> None:
+    """PUT /db/posts/{id} 更新不存在文章时返回 POST_NOT_FOUND。"""
+    r = db_client.put("/db/posts/999999", json={"title": "Missing", "content": "new"})
+
+    assert r.status_code == 404
+    assert r.json()["error"]["code"] == "POST_NOT_FOUND"
+
+
 def test_get_post_not_found_404(db_client) -> None:
     """不存在的 id -> 404 + POST_NOT_FOUND。"""
     r = db_client.get("/db/posts/999999")
@@ -109,6 +138,20 @@ def test_title_unique_constraint(db_client) -> None:
     """title 唯一约束：第二次同 title 提交 -> 409。"""
     db_client.post("/db/posts", json={"title": "Unique", "content": "1"})
     r = db_client.post("/db/posts", json={"title": "Unique", "content": "2"})
+    assert r.status_code == 409
+    assert r.json()["error"]["code"] == "DUPLICATE_TITLE"
+
+
+def test_update_post_duplicate_title_409(db_client) -> None:
+    """PUT 更新成已有 title 时返回 DUPLICATE_TITLE。"""
+    db_client.post("/db/posts", json={"title": "Taken", "content": "1"})
+    target = db_client.post("/db/posts", json={"title": "Editable", "content": "2"}).json()
+
+    r = db_client.put(
+        f"/db/posts/{target['id']}",
+        json={"title": "Taken", "content": "updated"},
+    )
+
     assert r.status_code == 409
     assert r.json()["error"]["code"] == "DUPLICATE_TITLE"
 

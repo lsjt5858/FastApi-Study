@@ -13,7 +13,7 @@
 ## 验收标准
 - [ ] services/cache.py 用 redis-py 异步客户端
 - [ ] GET /posts 命中缓存直接返回，否则查 DB 后回填 TTL=60s
-- [ ] POST/PUT/DELETE 触发缓存失效
+- [ ] `POST /db/posts`、`PUT /db/posts/{id}`、`DELETE /db/posts/{id}` 触发缓存失效
 - [ ] asyncio.Lock 单飞（并发只查 DB 一次）
 - [ ] 空值缓存防穿透（不存在的 filter 也缓存空）
 - [ ] 不同分页参数键名隔离
@@ -95,6 +95,12 @@ async def list_posts(
 @router.post("/", response_model=PostOut, status_code=201)
 async def create_post(...):
     post = await crud_posts.create(...)
+    await invalidate("posts:list:")
+    return post
+
+@router.put("/{post_id}", response_model=PostOut)
+async def update_post(...):
+    post = await crud_posts.update(...)
     await invalidate("posts:list:")
     return post
 ```
