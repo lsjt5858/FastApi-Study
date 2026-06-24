@@ -184,6 +184,7 @@ blog.db
 - 新增 `Dockerfile`：多阶段构建（builder pip install → runtime COPY）
 - 新增 `.dockerignore`：排除 .venv / __pycache__ / .env / blog.db
 - 新增 `docker-compose.yml`：postgres + redis + blog 三服务，healthcheck + depends_on
+- 新增 `app/db/init_startup.py`：教学部署场景可用 `INIT_DB_ON_STARTUP=true` 预启动建表
 - 新增 `verify-deploy.sh`：8 项部署自检脚本
 - 新增 `tests/test_19_deploy.py`：10 条测试（静态 + 真实 docker build/run/exec/stop）
-- `pyproject.toml` 依赖加 `gunicorn>=21` + `uvicorn[standard]>=0.30`
+- `pyproject.toml` 部署 extra 加 `gunicorn>=21` / `asyncpg` / `redis`

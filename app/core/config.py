@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     DEBUG: bool = False
     REDIS_URL: str = "redis://localhost:6379/0"
+    INIT_DB_ON_STARTUP: bool = False
 
 
 settings = Settings()

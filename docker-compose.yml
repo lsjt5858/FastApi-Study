@@ -49,6 +49,7 @@ services:
       SECRET_KEY: "change-me-in-production-via-env"
       ACCESS_TOKEN_EXPIRE_MINUTES: "60"
       DEBUG: "false"
+      INIT_DB_ON_STARTUP: "true"
     depends_on:
       postgres:
         condition: service_healthy

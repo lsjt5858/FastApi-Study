@@ -46,14 +46,8 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
     CMD python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/health', timeout=3).status==200 else 1)"
 
-# Gunicorn + UvicornWorker，4 个 worker 进程
+# 可选预启动建表 + Gunicorn/UvicornWorker，4 个 worker 进程
+# INIT_DB_ON_STARTUP=true 时，python -m app.db.init_startup 会先执行一次 Base.metadata.create_all。
 # --graceful-timeout: SIGTERM 后给 worker 多少秒处理完在途请求
 # --timeout: 单个 worker 心跳超时
-CMD ["gunicorn", "app.main:app", \
-     "-k", "uvicorn.workers.UvicornWorker", \
-     "--workers", "4", \
-     "--bind", "0.0.0.0:8000", \
-     "--graceful-timeout", "20", \
-     "--timeout", "60", \
-     "--access-logfile", "-", \
-     "--error-logfile", "-"]
+CMD ["sh", "-c", "python -m app.db.init_startup && exec gunicorn app.main:app -k uvicorn.workers.UvicornWorker --workers 4 --bind 0.0.0.0:8000 --graceful-timeout 20 --timeout 60 --access-logfile - --error-logfile -"]

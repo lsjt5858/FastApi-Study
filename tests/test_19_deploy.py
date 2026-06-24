@@ -46,6 +46,7 @@ def test_dockerfile_has_healthcheck_and_workers() -> None:
     assert "HEALTHCHECK" in dockerfile
     assert "--workers" in dockerfile and "4" in dockerfile
     assert "uvicorn.workers.UvicornWorker" in dockerfile
+    assert "python -m app.db.init_startup" in dockerfile
     assert "/health" in dockerfile, "HEALTHCHECK 应走 /health 端点"
 
 
@@ -64,6 +65,7 @@ def test_compose_yml_has_three_services() -> None:
     # blog 依赖 postgres 和 redis 的健康检查
     assert "depends_on" in compose
     assert "service_healthy" in compose
+    assert "INIT_DB_ON_STARTUP" in compose
     # 各服务都有 healthcheck
     assert compose.count("healthcheck") >= 3
 

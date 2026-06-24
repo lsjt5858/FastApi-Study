@@ -46,6 +46,7 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     DEBUG: bool = False
     REDIS_URL: str = "redis://localhost:6379/0"
+    INIT_DB_ON_STARTUP: bool = False
 
 
 settings = Settings()  # 模块级单例，import 即装配
@@ -147,6 +148,7 @@ SECRET_KEY="change-me-with-a-long-random-string"
 ACCESS_TOKEN_EXPIRE_MINUTES=60
 DEBUG=false
 REDIS_URL="redis://localhost:6379/0"
+INIT_DB_ON_STARTUP=false
 ```
 
 **规则**：

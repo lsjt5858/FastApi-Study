@@ -25,6 +25,7 @@ def test_settings_default_loads() -> None:
     assert s.DATABASE_URL.startswith("sqlite+aiosqlite")
     assert s.ACCESS_TOKEN_EXPIRE_MINUTES == 60
     assert s.ALGORITHM == "HS256"
+    assert s.INIT_DB_ON_STARTUP is False
 
 
 def test_env_var_overrides_setting(monkeypatch) -> None:
@@ -74,12 +75,26 @@ def test_env_file_loads(tmp_path, monkeypatch) -> None:
 
 
 def test_settings_supports_extra_fields_for_future() -> None:
-    """Settings 至少有 DATABASE_URL / SECRET_KEY / ACCESS_TOKEN_EXPIRE_MINUTES / ALGORITHM。"""
+    """Settings 至少有核心运行配置字段。"""
     from app.core.config import Settings
 
     s = Settings(_env_file=None)
-    for k in ("DATABASE_URL", "SECRET_KEY", "ACCESS_TOKEN_EXPIRE_MINUTES", "ALGORITHM"):
+    for k in (
+        "DATABASE_URL",
+        "SECRET_KEY",
+        "ACCESS_TOKEN_EXPIRE_MINUTES",
+        "ALGORITHM",
+        "INIT_DB_ON_STARTUP",
+    ):
         assert hasattr(s, k), f"missing {k}"
+
+
+def test_db_uses_settings_database_url() -> None:
+    """数据库 engine 的连接串来自 Settings，而不是在 db 层硬编码。"""
+    from app.core.config import settings
+    from app.db import DATABASE_URL
+
+    assert DATABASE_URL == settings.DATABASE_URL
 
 
 def test_main_app_has_multiple_routers() -> None:

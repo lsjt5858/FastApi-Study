@@ -2,7 +2,7 @@
 
 设计：
 - Base = DeclarativeBase，所有 model 继承它
-- engine = async engine（sqlite + aiosqlite）
+- engine = async engine（由 settings.DATABASE_URL 决定）
 - AsyncSessionLocal = async_sessionmaker
 - get_async_db() = async generator 依赖（yield AsyncSession + 事务管理）
 """
@@ -16,7 +16,9 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.orm import DeclarativeBase
 
-DATABASE_URL = "sqlite+aiosqlite:///./blog.db"
+from app.core.config import settings
+
+DATABASE_URL = settings.DATABASE_URL
 
 
 class Base(DeclarativeBase):
@@ -25,7 +27,8 @@ class Base(DeclarativeBase):
     pass
 
 
-# echo=False：关闭 SQL 日志；test 用 in-memory 覆盖这个 engine
+# echo=False：关闭 SQL 日志；test 用 in-memory 覆盖这个 engine。
+# 连接串从 Settings 读取，Docker / CI / 本地 .env 可以切换 SQLite 或 PostgreSQL。
 engine = create_async_engine(DATABASE_URL, echo=False, future=True)
 
 AsyncSessionLocal = async_sessionmaker(

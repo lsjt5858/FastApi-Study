@@ -28,6 +28,7 @@ dev = [
 db = [
     "sqlalchemy>=2.0",
     "aiosqlite>=0.20",
+    "asyncpg>=0.29",
 ]
 auth = [
     "python-jose[cryptography]>=3.3",
@@ -40,6 +41,11 @@ cache = [
 ]
 scheduler = [
     "apscheduler>=3.10",
+]
+deploy = [
+    "gunicorn>=21",
+    "asyncpg>=0.29",
+    "redis>=5.0",
 ]
 
 [tool.pytest.ini_options]
