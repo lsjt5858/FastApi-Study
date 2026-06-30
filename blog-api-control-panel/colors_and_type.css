@@ -1,0 +1,104 @@
+:root {
+  color-scheme: light;
+  --fastapi-panel-color-primary: #0f9b8e;
+  --fastapi-panel-color-primary-soft: #d9f5f1;
+  --fastapi-panel-color-primary-deep: #0a6d64;
+  --fastapi-panel-color-bg: #f3f6f7;
+  --fastapi-panel-color-surface: #ffffff;
+  --fastapi-panel-color-surface-alt: #edf3f4;
+  --fastapi-panel-color-border: #d8e1e4;
+  --fastapi-panel-color-text: #0f1720;
+  --fastapi-panel-color-text-muted: #5d6975;
+  --fastapi-panel-color-text-soft: #7b8792;
+  --fastapi-panel-color-success: #15803d;
+  --fastapi-panel-color-warning: #c07a10;
+  --fastapi-panel-color-error: #c2413b;
+  --fastapi-panel-color-info: #2563eb;
+  --fastapi-panel-radius-sm: 4px;
+  --fastapi-panel-radius-md: 8px;
+  --fastapi-panel-radius-lg: 12px;
+  --fastapi-panel-radius-full: 9999px;
+  --fastapi-panel-shadow-soft: 0 12px 32px rgba(15, 23, 32, 0.04);
+  --fastapi-panel-font-title:
+    "Inter", "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+  --fastapi-panel-font-body:
+    "Inter", "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+  --fastapi-primary: var(--fastapi-panel-color-primary);
+  --fastapi-background: var(--fastapi-panel-color-bg);
+  --fastapi-foreground: var(--fastapi-panel-color-text);
+  --fastapi-surface: var(--fastapi-panel-color-surface);
+  --fastapi-radius: var(--fastapi-panel-radius-lg);
+  --fastapi-shadow: var(--fastapi-panel-shadow-soft);
+}
+
+.dark {
+  color-scheme: dark;
+  --fastapi-panel-color-primary: #22c7b8;
+  --fastapi-panel-color-primary-soft: rgba(34, 199, 184, 0.16);
+  --fastapi-panel-color-primary-deep: #86efe2;
+  --fastapi-panel-color-bg: #071318;
+  --fastapi-panel-color-surface: #0f1d24;
+  --fastapi-panel-color-surface-alt: #13252e;
+  --fastapi-panel-color-border: rgba(158, 193, 201, 0.16);
+  --fastapi-panel-color-text: #ecf5f7;
+  --fastapi-panel-color-text-muted: #a0b3bb;
+  --fastapi-panel-color-text-soft: #7f949d;
+  --fastapi-panel-color-success: #4ade80;
+  --fastapi-panel-color-warning: #fbbf24;
+  --fastapi-panel-color-error: #fb7185;
+  --fastapi-panel-color-info: #60a5fa;
+  --fastapi-panel-shadow-soft: 0 18px 42px rgba(0, 0, 0, 0.18);
+  --fastapi-primary: var(--fastapi-panel-color-primary);
+  --fastapi-background: var(--fastapi-panel-color-bg);
+  --fastapi-foreground: var(--fastapi-panel-color-text);
+  --fastapi-surface: var(--fastapi-panel-color-surface);
+  --fastapi-radius: var(--fastapi-panel-radius-lg);
+  --fastapi-shadow: var(--fastapi-panel-shadow-soft);
+}
+
+body {
+  font-family: var(--fastapi-panel-font-body);
+  background: var(--fastapi-panel-color-bg);
+  color: var(--fastapi-panel-color-text);
+}
+
+.fastapi-panel-h1,
+.fastapi-panel-h2,
+.fastapi-panel-h3,
+.fastapi-panel-body,
+.fastapi-panel-caption {
+  letter-spacing: -0.02em;
+}
+
+.fastapi-panel-h1 {
+  font-family: var(--fastapi-panel-font-title);
+  font-size: clamp(2rem, 2.8vw, 2.8rem);
+  line-height: 1.08;
+  font-weight: 700;
+}
+
+.fastapi-panel-h2 {
+  font-family: var(--fastapi-panel-font-title);
+  font-size: clamp(1.2rem, 1.8vw, 1.5rem);
+  line-height: 1.2;
+  font-weight: 650;
+}
+
+.fastapi-panel-h3 {
+  font-family: var(--fastapi-panel-font-title);
+  font-size: 1rem;
+  line-height: 1.35;
+  font-weight: 600;
+}
+
+.fastapi-panel-body {
+  font-size: 0.94rem;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+.fastapi-panel-caption {
+  font-size: 0.78rem;
+  line-height: 1.45;
+  font-weight: 500;
+}

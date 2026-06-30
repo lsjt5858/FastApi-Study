@@ -1,0 +1,173 @@
+{
+  "project": {
+    "name": "博客 API 控制面",
+    "path": "/Users/bytedance/Desktop/字节/FastAPI/blog-api-control-panel",
+    "operation": "create",
+    "deviceType": "desktop",
+    "language": "zh-CN",
+    "dashboardMode": false,
+    "replicationMode": null,
+    "sourceUrl": null,
+    "visualSpecExcerpt": null,
+    "styleDefinitionBrief": "专业工程控制台，使用 FastAPI 语义化的青绿色主色，强调项目健康、课程进度与系统运维入口。",
+    "designRead": "开发者后台控制面 / 教学项目维护者 / 工程专业且克制 / 高密度 / 避免廉价霓虹看板感",
+    "designDials": {
+      "layoutVariance": 2,
+      "motionIntensity": 1,
+      "visualDensity": 4
+    },
+    "styleContinuityAnchors": {
+      "colorSystem": {
+        "primaryColorRole": "单一青绿色主色用于主按钮、选中态、关键进度和状态强调",
+        "brandHuePolicy": "只保留一个品牌主色，不引入 secondary 或 accent，其他信息层用中性色和主色浅阶",
+        "stateColors": "success、warning、error、info 仅用于语义状态"
+      },
+      "shapeSystem": "卡片和控件统一使用 4px / 8px / 12px 的克制圆角，避免过圆的消费化风格。",
+      "typographySystem": "标题和正文统一使用 Inter + 中文无衬线系统字体，强调紧凑、清晰、适合中英混排的后台体验。",
+      "spacingSystem": "页面以 8px 为基础节奏，模块间使用 16px、24px、32px 的递进间距。",
+      "componentLanguage": "以边框分层和弱阴影卡片为主，顶部状态条、左侧导航、指标卡、表格和日志列表保持统一风格。",
+      "surfaceAndDepth": "静态面板以描边和浅层背景区分，浮层以最轻阴影表达，避免厚重投影。",
+      "imageryAndIconography": "不依赖图片，使用简洁线性图标、进度环和折线图表达系统状态。",
+      "interactionTone": "悬停与选中反馈克制直接，重点在提高扫读效率而非炫技动效。"
+    },
+    "specsConstraints": null,
+    "sharedProjectShellContract": null,
+    "generationTree": null
+  },
+  "designSource": {
+    "operatingMode": "free-explore",
+    "libraryIdentity": {
+      "name": null,
+      "id": null,
+      "version": null,
+      "scope": null,
+      "path": null,
+      "versionSource": null
+    },
+    "cssFilePath": "/Users/bytedance/Desktop/字节/FastAPI/blog-api-control-panel/colors_and_type.css",
+    "brandPrefix": "fastapi-panel",
+    "themeMode": "dark",
+    "designDecisionSummary": "工程型控制台，深色顶栏与深浅混合面板结构，青绿色主色作为唯一品牌强调。",
+    "componentContractKind": "compact-json",
+    "forbiddenInventedComponents": [],
+    "allowedComponents": [
+      "sidebar",
+      "topbar",
+      "metric-card",
+      "table",
+      "chart",
+      "timeline"
+    ],
+    "styleConstraints": {
+      "radiusMax": 16,
+      "spacingBase": 8,
+      "fontSizeBody": 15,
+      "fontSizeMin": 12,
+      "controlHeightDefault": 40,
+      "controlHeightLarge": 46,
+      "staticShadowAlphaMax": 0.05
+    },
+    "productContext": {
+      "kitType": "developer-control-panel",
+      "productType": "FastAPI 教学博客后端"
+    },
+    "actualTokenNameReference": [
+      {
+        "semanticPurpose": "Primary action / active state",
+        "tokenName": "fastapi-panel-color-primary"
+      },
+      {
+        "semanticPurpose": "Primary subtle background",
+        "tokenName": "fastapi-panel-color-primary-soft"
+      },
+      {
+        "semanticPurpose": "Primary deep emphasis",
+        "tokenName": "fastapi-panel-color-primary-deep"
+      },
+      {
+        "semanticPurpose": "Page background",
+        "tokenName": "fastapi-panel-color-bg"
+      },
+      {
+        "semanticPurpose": "Panel surface",
+        "tokenName": "fastapi-panel-color-surface"
+      },
+      {
+        "semanticPurpose": "Alternate surface",
+        "tokenName": "fastapi-panel-color-surface-alt"
+      },
+      {
+        "semanticPurpose": "Border / divider",
+        "tokenName": "fastapi-panel-color-border"
+      },
+      {
+        "semanticPurpose": "Primary text",
+        "tokenName": "fastapi-panel-color-text"
+      },
+      {
+        "semanticPurpose": "Muted text",
+        "tokenName": "fastapi-panel-color-text-muted"
+      },
+      {
+        "semanticPurpose": "Soft text",
+        "tokenName": "fastapi-panel-color-text-soft"
+      },
+      {
+        "semanticPurpose": "Success state",
+        "tokenName": "fastapi-panel-color-success"
+      },
+      {
+        "semanticPurpose": "Warning state",
+        "tokenName": "fastapi-panel-color-warning"
+      },
+      {
+        "semanticPurpose": "Error state",
+        "tokenName": "fastapi-panel-color-error"
+      },
+      {
+        "semanticPurpose": "Info state",
+        "tokenName": "fastapi-panel-color-info"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "nodeId": "page-dashboard-overview",
+      "slug": "dashboard-overview",
+      "title": "控制台总览",
+      "htmlSrc": "pages/dashboard-overview.html",
+      "pageIndex": 1,
+      "stateGroupId": null,
+      "stateRole": null,
+      "baseStatePageId": null,
+      "sharedShellContract": [],
+      "mutableRegions": [],
+      "derivedFromHtmlSrc": null,
+      "derivationType": "original",
+      "sourcePageId": null,
+      "sourceHtmlSrc": null,
+      "pageType": "information-dense",
+      "businessScenario": "教学博客 API 的管理控制面，汇总课程进度、接口能力、运行状态和维护入口。",
+      "visualNorthStar": "像开发团队每日打开的项目驾驶舱，先看健康与进度，再看核心能力和最近动作。",
+      "compositionPattern": null,
+      "continuityAnchors": [
+        "左侧导航与顶部状态条形成稳定扫描路径",
+        "青绿色主色只用于关键操作和状态高亮",
+        "面板以边框和明暗层级组织高密度信息"
+      ],
+      "libraryRestraintMode": false,
+      "uiKitPath": null,
+      "componentPlan": [],
+      "imagePlan": [],
+      "chartsRequired": true,
+      "miniProgramStyle": false,
+      "qualityRisks": [
+        "高密度信息下层级拥挤",
+        "接口名与中文说明混排容易跳读"
+      ]
+    }
+  ],
+  "assets": [],
+  "wiringPlan": [],
+  "hiddenInteractionPlan": []
+}

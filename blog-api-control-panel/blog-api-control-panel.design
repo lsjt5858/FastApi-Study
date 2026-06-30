@@ -1,0 +1,25 @@
+{
+  "data": [
+    {
+      "id": "page-dashboard-overview",
+      "title": "控制台总览",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1782468300000,
+      "canvasData": {
+        "x": 0,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/dashboard-overview.html",
+        "interactions": []
+      }
+    }
+  ],
+  "config": {
+    "autoLayout": true,
+    "deviceType": "desktop",
+    "projectName": "博客 API 控制面"
+  }
+}

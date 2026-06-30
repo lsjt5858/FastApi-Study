@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>控制台总览</title>
+    <style id="theme-vars">
+:root {
+  color-scheme: light;
+  --fastapi-panel-color-primary: #0f9b8e;
+  --fastapi-panel-color-primary-soft: #d9f5f1;
+  --fastapi-panel-color-primary-deep: #0a6d64;
+  --fastapi-panel-color-bg: #f3f6f7;
+  --fastapi-panel-color-surface: #ffffff;
+  --fastapi-panel-color-surface-alt: #edf3f4;
+  --fastapi-panel-color-border: #d8e1e4;
+  --fastapi-panel-color-text: #0f1720;
+  --fastapi-panel-color-text-muted: #5d6975;
+  --fastapi-panel-color-text-soft: #7b8792;
+  --fastapi-panel-color-success: #15803d;
+  --fastapi-panel-color-warning: #c07a10;
+  --fastapi-panel-color-error: #c2413b;
+  --fastapi-panel-color-info: #2563eb;
+  --fastapi-panel-radius-sm: 4px;
+  --fastapi-panel-radius-md: 8px;
+  --fastapi-panel-radius-lg: 12px;
+  --fastapi-panel-radius-full: 9999px;
+  --fastapi-panel-shadow-soft: 0 12px 32px rgba(15, 23, 32, 0.04);
+  --fastapi-panel-font-title:
+    "Inter", "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+  --fastapi-panel-font-body:
+    "Inter", "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+  --fastapi-primary: var(--fastapi-panel-color-primary);
+  --fastapi-background: var(--fastapi-panel-color-bg);
+  --fastapi-foreground: var(--fastapi-panel-color-text);
+  --fastapi-surface: var(--fastapi-panel-color-surface);
+  --fastapi-radius: var(--fastapi-panel-radius-lg);
+  --fastapi-shadow: var(--fastapi-panel-shadow-soft);
+}
+
+.dark {
+  color-scheme: dark;
+  --fastapi-panel-color-primary: #22c7b8;
+  --fastapi-panel-color-primary-soft: rgba(34, 199, 184, 0.16);
+  --fastapi-panel-color-primary-deep: #86efe2;
+  --fastapi-panel-color-bg: #071318;
+  --fastapi-panel-color-surface: #0f1d24;
+  --fastapi-panel-color-surface-alt: #13252e;
+  --fastapi-panel-color-border: rgba(158, 193, 201, 0.16);
+  --fastapi-panel-color-text: #ecf5f7;
+  --fastapi-panel-color-text-muted: #a0b3bb;
+  --fastapi-panel-color-text-soft: #7f949d;
+  --fastapi-panel-color-success: #4ade80;
+  --fastapi-panel-color-warning: #fbbf24;
+  --fastapi-panel-color-error: #fb7185;
+  --fastapi-panel-color-info: #60a5fa;
+  --fastapi-panel-shadow-soft: 0 18px 42px rgba(0, 0, 0, 0.18);
+  --fastapi-primary: var(--fastapi-panel-color-primary);
+  --fastapi-background: var(--fastapi-panel-color-bg);
+  --fastapi-foreground: var(--fastapi-panel-color-text);
+  --fastapi-surface: var(--fastapi-panel-color-surface);
+  --fastapi-radius: var(--fastapi-panel-radius-lg);
+  --fastapi-shadow: var(--fastapi-panel-shadow-soft);
+}
+
+body {
+  font-family: var(--fastapi-panel-font-body);
+  background: var(--fastapi-panel-color-bg);
+  color: var(--fastapi-panel-color-text);
+}
+
+.fastapi-panel-h1,
+.fastapi-panel-h2,
+.fastapi-panel-h3,
+.fastapi-panel-body,
+.fastapi-panel-caption {
+  letter-spacing: -0.02em;
+}
+
+.fastapi-panel-h1 {
+  font-family: var(--fastapi-panel-font-title);
+  font-size: clamp(2rem, 2.8vw, 2.8rem);
+  line-height: 1.08;
+  font-weight: 700;
+}
+
+.fastapi-panel-h2 {
+  font-family: var(--fastapi-panel-font-title);
+  font-size: clamp(1.2rem, 1.8vw, 1.5rem);
+  line-height: 1.2;
+  font-weight: 650;
+}
+
+.fastapi-panel-h3 {
+  font-family: var(--fastapi-panel-font-title);
+  font-size: 1rem;
+  line-height: 1.35;
+  font-weight: 600;
+}
+
+.fastapi-panel-body {
+  font-size: 0.94rem;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+.fastapi-panel-caption {
+  font-size: 0.78rem;
+  line-height: 1.45;
+  font-weight: 500;
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--fastapi-background);
+    --color-foreground: var(--fastapi-foreground);
+    --color-primary: var(--fastapi-primary);
+  }
+  @layer base {
+    body { background: var(--fastapi-background); color: var(--fastapi-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="min-h-screen px-4 py-4 sm:px-6 lg:px-8">
+      <div class="mx-auto max-w-[1440px]">
+        <div class="flex flex-col gap-4 lg:flex-row">
+          <aside class="lg:sticky lg:top-4 lg:w-72 lg:self-start">
+            <div class="overflow-hidden rounded-[12px] border p-4" style="background: var(--fastapi-panel-color-surface); border-color: var(--fastapi-panel-color-border);">
+              <div class="flex items-center gap-3">
+                <div class="flex h-11 w-11 items-center justify-center rounded-[8px]" style="background: var(--fastapi-panel-color-primary-soft); color: var(--fastapi-panel-color-primary);">
+                  <i data-lucide="command" class="h-5 w-5"></i>
+                </div>
+                <div class="min-w-0">
+                  <p class="fastapi-panel-caption truncate" style="color: var(--fastapi-panel-color-text-soft);">FastAPI 教学博客</p>
+                  <p class="fastapi-panel-h3 truncate" style="color: var(--fastapi-panel-color-text);">控制面</p>
+                </div>
+              </div>
+              <div class="mt-4 rounded-[8px] border p-3" style="background: var(--fastapi-panel-color-surface-alt); border-color: var(--fastapi-panel-color-border);">
+                <div class="flex items-center justify-between gap-3">
+                  <span class="fastapi-panel-caption inline-flex items-center justify-center whitespace-nowrap rounded-[8px] px-2.5 py-1" style="background: var(--fastapi-panel-color-primary-soft); color: var(--fastapi-panel-color-primary);">主线项目</span>
+                  <span class="fastapi-panel-caption whitespace-nowrap" style="color: var(--fastapi-panel-color-text-soft);">round 20</span>
+                </div>
+                <p class="mt-3 fastapi-panel-h3" style="color: var(--fastapi-panel-color-text);">博客 API</p>
+                <p class="mt-2 fastapi-panel-body" style="color: var(--fastapi-panel-color-text-muted);">20 个 task 已收敛为同一套后端，覆盖认证、缓存、实时通信、版本化与部署链路。</p>
+              </div>
+              <nav class="mt-4 space-y-2" aria-label="侧边导航">
+                <a href="#overview" data-dom-id="nav-dashboard" class="group flex items-center gap-3 rounded-[8px] px-3 py-2.5 transition-[color,transform] duration-150 motion-reduce:transition-none" style="color: var(--fastapi-panel-color-primary);">
+                  <i data-lucide="layout-dashboard" class="h-4 w-4 shrink-0"></i>
+                  <span class="fastapi-panel-body truncate">总览</span>
+                </a>
+                <a href="#course" data-dom-id="nav-course" class="group flex items-center gap-3 rounded-[8px] px-3 py-2.5 transition-[color,transform] duration-150 motion-reduce:transition-none hover:translate-x-[2px]" style="color: var(--fastapi-panel-color-text-muted);" onmouseover="this.style.color='var(--fastapi-panel-color-text)'" onmouseout="this.style.color='var(--fastapi-panel-color-text-muted)'">
+                  <i data-lucide="graduation-cap" class="h-4 w-4 shrink-0"></i>
+                  <span class="fastapi-panel-body truncate">课程</span>
+                </a>
+                <a href="#capability" data-dom-id="nav-capability" class="group flex items-center gap-3 rounded-[8px] px-3 py-2.5 transition-[color,transform] duration-150 motion-reduce:transition-none hover:translate-x-[2px]" style="color: var(--fastapi-panel-color-text-muted);" onmouseover="this.style.color='var(--fastapi-panel-color-text)'" onmouseout="this.style.color='var(--fastapi-panel-color-text-muted)'">
+                  <i data-lucide="waypoints" class="h-4 w-4 shrink-0"></i>
+                  <span class="fastapi-panel-body truncate">接口</span>
+                </a>
+                <a href="#runtime" data-dom-id="nav-runtime" class="group flex items-center gap-3 rounded-[8px] px-3 py-2.5 transition-[color,transform] duration-150 motion-reduce:transition-none hover:translate-x-[2px]" style="color: var(--fastapi-panel-color-text-muted);" onmouseover="this.style.color='var(--fastapi-panel-color-text)'" onmouseout="this.style.color='var(--fastapi-panel-color-text-muted)'">
+                  <i data-lucide="server-cog" class="h-4 w-4 shrink-0"></i>
+                  <span class="fastapi-panel-body truncate">运维</span>
+                </a>
+                <a href="#activity" data-dom-id="nav-activity" class="group flex items-center gap-3 rounded-[8px] px-3 py-2.5 transition-[color,transform] duration-150 motion-reduce:transition-none hover:translate-x-[2px]" style="color: var(--fastapi-panel-color-text-muted);" onmouseover="this.style.color='var(--fastapi-panel-color-text)'" onmouseout="this.style.color='var(--fastapi-panel-color-text-muted)'">
+                  <i data-lucide="logs" class="h-4 w-4 shrink-0"></i>
+                  <span class="fastapi-panel-body truncate">日志</span>
+                </a>
+              </nav>
+              <div class="mt-6 border-t pt-4" style="border-color: var(--fastapi-panel-color-border);">
+                <p class="fastapi-panel-caption" style="color: var(--fastapi-panel-color-text-soft);">维护入口</p>
+                <div class="mt-3 space-y-3">
+                  <div class="flex items-center justify-between gap-3">
+                    <span class="fastapi-panel-body truncate" style="color: var(--fastapi-panel-color-text);">文档</span>
+                    <code class="fastapi-panel-caption whitespace-nowrap" style="color: var(--fastapi-panel-color-primary-deep);">/docs</code>
+                  </div>
+                  <div class="flex items-center justify-between gap-3">
+                    <span class="fastapi-panel-body truncate" style="color: var(--fastapi-panel-color-text);">健康</span>
+                    <code class="fastapi-panel-caption whitespace-nowrap" style="color: var(--fastapi-panel-color-primary-deep);">/health</code>
+                  </div>
+                  <div class="flex items-center justify-between gap-3">
+                    <span class="fastapi-panel-body truncate" style="color: var(--fastapi-panel-color-text);">版本</span>
+                    <code class="fastapi-panel-caption whitespace-nowrap" style="color: var(--fastapi-panel-color-primary-deep);">/api/v1 · /api/v2</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          <div class="min-w-0 flex-1 space-y-4">
+            <header class="rounded-[12px] border px-4 py-3 sm:px-5" style="background: var(--fastapi-panel-color-surface); border-color: var(--fastapi-panel-color-border);" id="overview">
+              <div class="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+                <div class="min-w-0">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <span class="fastapi-panel-caption inline-flex items-center justify-center whitespace-nowrap rounded-[8px] px-2.5 py-1" style="background: var(--fastapi-panel-color-primary-soft); color: var(--fastapi-panel-color-primary);">主线稳定</span>
+                    <span class="fastapi-panel-caption inline-flex items-center justify-center whitespace-nowrap rounded-[8px] px-2.5 py-1" style="background: var(--fastapi-panel-color-surface-alt); color: var(--fastapi-panel-color-text-muted);">20/20 完成</span>
+                    <span class="fastapi-panel-caption inline-flex items-center justify-center whitespace-nowrap rounded-[8px] px-2.5 py-1" style="background: var(--fastapi-panel-color-surface-alt); color: var(--fastapi-panel-color-text-muted);">20 组测试</span>
+                  </div>
+                  <p class="mt-2 fastapi-panel-body" style="color: var(--fastapi-panel-color-text-muted);">先看健康与进度，再看接口与运维入口。当前控制面聚焦博客 API 教学主线、测试完备度与部署可用性。</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 xl:justify-end">
+                  <button type="button" data-dom-id="action-open-docs" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[8px] px-4 py-2 transition-[background-color,transform,color] duration-150 motion-reduce:transition-none hover:-translate-y-[1px] active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-60" style="background: var(--fastapi-panel-color-primary); color: var(--fastapi-panel-color-bg); --tw-ring-color: var(--fastapi-panel-color-primary);">
+                    <span class="fastapi-panel-body">查看文档</span>
+                    <i data-lucide="arrow-right" class="h-4 w-4 transition-transform duration-150 motion-reduce:transition-none group-hover:translate-x-[2px]"></i>
+                  </button>
+                  <button type="button" data-dom-id="action-open-health" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[8px] border px-4 py-2 transition-[background-color,border-color,transform,color] duration-150 motion-reduce:transition-none hover:-translate-y-[1px] active:translate-y-0 focus-visible:outline-none focus-visible:ring-2" style="background: transparent; border-color: var(--fastapi-panel-color-border); color: var(--fastapi-panel-color-text); --tw-ring-color: var(--fastapi-panel-color-primary);">
+                    <span class="fastapi-panel-body">健康检查</span>
+                  </button>
+                </div>
+              </div>
+            </header>
+
+            <section class="rounded-[12px] border p-5 sm:p-6" style="background: var(--fastapi-panel-color-surface); border-color: var(--fastapi-panel-color-border);">
+              <div class="flex flex-col gap-4">
+                <div class="min-w-0">
+                  <h1 class="fastapi-panel-h1" style="color: var(--fastapi-panel-color-text); text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">控制台总览</h1>
+                  <p class="mt-3 max-w-[880px] fastapi-panel-body" style="color: var(--fastapi-panel-color-text-muted);">这个控制面服务于课程维护者与接口开发者，汇总 20 个教学任务、核心路由、版本化 API、缓存与部署状态，并保留管理员删除与 WebSocket 评论房间等关键入口。</p>
+                  <div class="mt-4 flex flex-wrap items-center gap-2">
+                    <span class="fastapi-panel-caption inline-flex items-center justify-center whitespace-nowrap rounded-[8px] px-3 py-1.5" style="background: var(--fastapi-panel-color-surface-alt); color: var(--fastapi-panel-color-text-muted);">Blog API 主线</span>
+                    <span class="fastapi-panel-caption inline-flex items-center justify-center whitespace-nowrap rounded-[8px] px-3 py-1.5" style="background: var(--fastapi-panel-color-surface-alt); color: var(--fastapi-panel-color-text-muted);">docs/lessons 20 篇</span>
+                    <span class="fastapi-panel-caption inline-flex items-center justify-center whitespace-nowrap rounded-[8px] px-3 py-1.5" style="background: var(--fastapi-panel-color-surface-alt); color: var(--fastapi-panel-color-text-muted);">tests 20 套件</span>
+                    <span class="fastapi-panel-caption inline-flex items-center justify-center whitespace-nowrap rounded-[8px] px-3 py-1.5" style="background: var(--fastapi-panel-color-surface-alt); color: var(--fastapi-panel-color-text-muted);">Docker + Redis</span>
+                  </div>
+                </div>
+
+                <div class="grid gap-4 md:grid-cols-2 2xl:grid-cols-4">
+                  <article class="rounded-[8px] border p-4 transition-[background-color,border-color,transform] duration-150 motion-reduce:transition-none hover:-translate-y-[2px]" style="background: var(--fastapi-panel-color-surface-alt); border-color: var(--fastapi-panel-color-border);">
+                    <div class="flex items-start justify-between gap-3">
+                      <div class="min-w-0">
+                        <p class="fastapi-panel-caption truncate" style="color: var(--fastapi-panel-color-text-soft);">任务闭环</p>
+                        <p class="mt-2 text-[2rem] font-semibold leading-none" style="color: var(--fastapi-panel-color-text); font-family: var(--fastapi-panel-font-title); font-variant-numeric: tabular-nums;">20/20</p>
+                      </div>
+                      <span class="inline-flex h-9 w-9 items-center justify-center rounded-[8px]" style="background: var(--fastapi-panel-color-primary-soft); color: var(--fastapi-panel-color-primary);">
+                        <i data-lucide="check-check" class="h-4 w-4"></i>
+                      </span>
+                    </div>
+                    <p class="mt-3 fastapi-panel-body" style="color: var(--fastapi-panel-color-text-muted);">渐进式博客系统已完成最终整合，task-20 进入端到端验收。</p>
+                  </article>
+                  <article class="rounded-[8px] border p-4 transition-[background-color,border-color,transform] duration-150 motion-reduce:transition-none hover:-translate-y-[2px]" style="background: var(--fastapi-panel-color-surface-alt); border-color: var(--fastapi-panel-color-border);">
+                    <div class="flex items-start justify-between gap-3">
+                      <div class="min-w-0">
+                        <p class="fastapi-panel-caption truncate" style="color: var(--fastapi-panel-color-text-soft);">测试套件</p>
+                        <p class="mt-2 text-[2rem] font-semibold leading-none" style="color: var(--fastapi-panel-color-text); font-family: var(--fastapi-panel-font-title); font-variant-numeric: tabular-nums;">20 组</p>
+                      </div>
+                      <span class="inline-flex h-9 w-9 items-center justify-center rounded-[8px]" style="background: var(--fastapi-panel-color-primary-soft); color: var(--fastapi-panel-color-primary);">
+                        <i data-lucide="flask-conical" class="h-4 w-4"></i>
+                      </span>
+                    </div>
+                    <p class="mt-3 fastapi-panel-body" style="color: var(--fastapi-panel-color-text-muted);">从 hello 到 blog e2e，每个阶段都保留 pytest 验收入口。</p>
+                  </article>
+                  <article class="rounded-[8px] border p-4 transition-[background-color,border-color,transform] duration-150 motion-reduce:transition-none hover:-translate-y-[2px]" style="background: var(--fastapi-panel-color-surface-alt); border-color: var(--fastapi-panel-color-border);">
+                    <div class="flex items-start justify-between gap-3">
+                      <div class="min-w-0">
+                        <p class="fastapi-panel-caption truncate" style="color: var(--fastapi-panel-color-text-soft);">关键模块</p>
+                        <p class="mt-2 text-[2rem] font-semibold leading-none" style="color: var(--fastapi-panel-color-text); font-family: var(--fastapi-panel-font-title); font-variant-numeric: tabular-nums;">6 项</p>
+                      </div>
+                      <span class="inline-flex h-9 w-9 items-center justify-center rounded-[8px]" style="background: var(--fastapi-panel-color-primary-soft); color: var(--fastapi-panel-color-primary);">
+                        <i data-lucide="boxes" class="h-4 w-4"></i>
+                      </span>
+                    </div>
+                    <p class="mt-3 fastapi-panel-body" style="color: var(--fastapi-panel-color-text-muted);">auth、admin、websocket、cache、scheduler、deploy 已纳入维护视图。</p>
+                  </article>
+                  <article class="rounded-[8px] border p-4 transition-[background-color,border-color,transform] duration-150 motion-reduce:transition-none hover:-translate-y-[2px]" style="background: var(--fastapi-panel-color-surface-alt); border-color: var(--fastapi-panel-color-border);">
+                    <div class="flex items-start justify-between gap-3">
+                      <div class="min-w-0">
+                        <p class="fastapi-panel-caption truncate" style="color: var(--fastapi-panel-color-text-soft);">运行入口</p>
+                        <p class="mt-2 text-[2rem] font-semibold leading-none" style="color: var(--fastapi-panel-color-text); font-family: var(--fastapi-panel-font-title); font-variant-numeric: tabular-nums;">3 个</p>
+                      </div>
+                      <span class="inline-flex h-9 w-9 items-center justify-center rounded-[8px]" style="background: var(--fastapi-panel-color-primary-soft); color: var(--fastapi-panel-color-primary);">
+                        <i data-lucide="route" class="h-4 w-4"></i>
+                      </span>
+                    </div>
+                    <p class="mt-3 fastapi-panel-body" style="color: var(--fastapi-panel-color-text-muted);">根路径、文档与健康检查构成最短维护链路。</p>
+                  </article>
+                </div>
+              </div>
+            </section>
+
+            <section id="course" class="grid gap-4 xl:grid-cols-[1.45fr,0.95fr]">
+              <article class="rounded-[12px] border p-5 sm:p-6" style="background: var(--fastapi-panel-color-surface); border-color: var(--fastapi-panel-color-border);">
+                <div class="flex items-center justify-between gap-3">
+                  <div class="min-w-0">
+                    <h2 class="fastapi-panel-h2" style="color: var(--fastapi-panel-color-text); text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">课程进度</h2>
+                    <p class="mt-2 fastapi-panel-body" style="color: var(--fastapi-panel-color-text-muted);">20 个章节已经从骨架、异步、数据库推进到缓存、部署与综合实战，教学资料与代码主线保持一致。</p>
+                  </div>
+                  <button type="button" data-dom-id="action-open-course" class="inline-flex items-center justify-center whitespace-nowrap rounded-[8px] border px-3.5 py-2 transition-[background-color,border-color,color] duration-150 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2" style="border-color: var(--fastapi-panel-color-border); color: var(--fastapi-panel-color-text); --tw-ring-color: var(--fastapi-panel-color-primary);" onmouseover="this.style.background='var(--fastapi-panel-color-surface-alt)'" onmouseout="this.style.background='transparent'">
+                    <span class="fastapi-panel-body">查看课程</span>
+                  </button>
+                </div>
+                <div class="mt-5 grid gap-4 lg:grid-cols-[0.95fr,1.05fr]">
+                  <div class="space-y-3">
+                    <div class="rounded-[8px] border p-3.5" style="border-color: var(--fastapi-panel-color-border); background: var(--fastapi-panel-color-surface-alt);">
+                      <div class="flex items-center justify-between gap-3">
+                        <div class="min-w-0">
+                          <p class="fastapi-panel-h3 truncate" style="color: var(--fastapi-panel-color-text);">入门基础</p>
+                          <p class="mt-1 fastapi-panel-caption" style="color: var(--fastapi-panel-color-text-soft);">task 1-4</p>
+                        </div>
+                        <span class="fastapi-panel-caption inline-flex items-center justify-center whitespace-nowrap rounded-[8px] px-2.5 py-1" style="background: var(--fastapi-panel-color-primary-soft); color: var(--fastapi-panel-color-primary);">4/4</span>
+                      </div>
+                      <p class="mt-3 fastapi-panel-body" style="color: var(--fastapi-panel-color-text-muted);">项目骨架、参数、请求体、文件上传。</p>
+                    </div>
+                    <div class="rounded-[8px] border p-3.5" style="border-color: var(--fastapi-panel-color-border); background: var(--fastapi-panel-color-surface-alt);">
+                      <div class="flex items-center justify-between gap-3">
+                        <div class="min-w-0">
+                          <p class="fastapi-panel-h3 truncate" style="color: var(--fastapi-panel-color-text);">核心进阶</p>
+                          <p class="mt-1 fastapi-panel-caption" style="color: var(--fastapi-panel-color-text-soft);">task 5-8</p>
+                        </div>
+                        <span class="fastapi-panel-caption inline-flex items-center justify-center whitespace-nowrap rounded-[8px] px-2.5 py-1" style="background: var(--fastapi-panel-color-primary-soft); color: var(--fastapi-panel-color-primary);">8/8</span>
+                      </div>
+                      <p class="mt-3 fastapi-panel-body" style="color: var(--fastapi-panel-color-text-muted);">响应模型、依赖注入、校验器与异步聚合。</p>
+                    </div>
+                    <div class="rounded-[8px] border p-3.5" style="border-color: var(--fastapi-panel-color-border); background: var(--fastapi-panel-color-surface-alt);">
+                      <div class="flex items-center justify-between gap-3">
+                        <div class="min-w-0">
+                          <p class="fastapi-panel-h3 truncate" style="color: var(--fastapi-panel-color-text);">工程化</p>
+                          <p class="mt-1 fastapi-panel-caption" style="color: var(--fastapi-panel-color-text-soft);">task 9-12</p>
+                        </div>
+                        <span class="fastapi-panel-caption inline-flex items-center justify-center whitespace-nowrap rounded-[8px] px-2.5 py-1" style="background: var(--fastapi-panel-color-primary-soft); color: var(--fastapi-panel-color-primary);">12/12</span>
+                      </div>
+                      <p class="mt-3 fastapi-panel-body" style="color: var(--fastapi-panel-color-text-muted);">中间件、异常、数据库、JWT 认证与授权。</p>
+                    </div>
+                    <div class="rounded-[8px] border p-3.5" style="border-color: var(--fastapi-panel-color-border); background: var(--fastapi-panel-color-surface-alt);">
+                      <div class="flex items-center justify-between gap-3">
+                        <div class="min-w-0">
+                          <p class="fastapi-panel-h3 truncate" style="color: var(--fastapi-panel-color-text);">高级特性</p>
+                          <p class="mt-1 fastapi-panel-caption" style="color: var(--fastapi-panel-color-text-soft);">task 13-16</p>
+                        </div>
+                        <span class="fastapi-panel-caption inline-flex items-center justify-center whitespace-nowrap rounded-[8px] px-2.5 py-1" style="background: var(--fastapi-panel-color-primary-soft); color: var(--fastapi-panel-color-primary);">16/16</span>
+                      </div>
+                      <p class="mt-3 fastapi-panel-body" style="color: var(--fastapi-panel-color-text-muted);">调度、WebSocket、OpenAPI 与测试体系。</p>
+                    </div>
+                    <div class="rounded-[8px] border p-3.5" style="border-color: var(--fastapi-panel-color-border); background: var(--fastapi-panel-color-surface-alt);">
+                      <div class="flex items-center justify-between gap-3">
+                        <div class="min-w-0">
+                          <p class="fastapi-panel-h3 truncate" style="color: var(--fastapi-panel-color-text);">项目实战</p>
+                          <p class="mt-1 fastapi-panel-caption" style="color: var(--fastapi-panel-color-text-soft);">task 17-20</p>
+                        </div>
+                        <span class="fastapi-panel-caption inline-flex items-center justify-center whitespace-nowrap rounded-[8px] px-2.5 py-1" style="background: var(--fastapi-panel-color-primary-soft); color: var(--fastapi-panel-color-primary);">20/20</span>
+                      </div>
+                      <p class="mt-3 fastapi-panel-body" style="color: var(--fastapi-panel-color-text-muted);">结构、缓存、部署与综合 e2e 验收。</p>
+                    </div>
+                  </div>
+                  <div class="min-w-0 rounded-[8px] border p-4" style="border-color: var(--fastapi-panel-color-border); background: var(--fastapi-panel-color-surface-alt);">
+                    <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                      <div class="min-w-0">
+                        <p class="fastapi-panel-h3" style="color: var(--fastapi-panel-color-text);">推进曲线</p>
+                        <p class="mt-1 fastapi-panel-caption" style="color: var(--fastapi-panel-color-text-soft);">按 README 学习路线累积完成度</p>
+                      </div>
+                      <div class="flex items-center gap-3 lg:justify-end">
+                        <div class="h-20 w-20">
+                          <canvas id="taskCompletionChart" width="160" height="160" aria-label="任务完成环图"></canvas>
+                        </div>
+                        <div class="min-w-0">
+                          <p class="fastapi-panel-caption" style="color: var(--fastapi-panel-color-text-soft);">当前状态</p>
+                          <p class="mt-1 text-[1.6rem] font-semibold leading-none" style="color: var(--fastapi-panel-color-text); font-family: var(--fastapi-panel-font-title); font-variant-numeric: tabular-nums;">100%</p>
+                          <p class="mt-2 fastapi-panel-caption" style="color: var(--fastapi-panel-color-success);">教学主线已闭环</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="mt-4 h-64">
+                      <canvas id="courseProgressChart" width="600" height="320" aria-label="课程推进折线图"></canvas>
+                    </div>
+                  </div>
+                </div>
+              </article>
+
+              <article class="rounded-[12px] border p-5 sm:p-6" style="background: var(--fastapi-panel-color-surface); border-color: var(--fastapi-panel-color-border);">
+                <div class="flex items-center justify-between gap-3">
+                  <div class="min-w-0">
+                    <h2 class="fastapi-panel-h2" style="color: var(--fastapi-panel-color-text); text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">学习产出</h2>
+                    <p class="mt-2 fastapi-panel-body" style="color: var(--fastapi-panel-color-text-muted);">文档、源码与测试围绕同一仓库推进，保持课程节奏与实际代码一致。</p>
+                  </div>
+                  <i data-lucide="book-open-check" class="h-5 w-5 shrink-0" style="color: var(--fastapi-panel-color-primary);"></i>
+                </div>
+                <div class="mt-5 space-y-4">
+                  <div class="rounded-[8px] border p-4" style="border-color: var(--fastapi-panel-color-border); background: var(--fastapi-panel-color-surface-alt);">
+                    <div class="flex items-center justify-between gap-3">
+                      <span class="fastapi-panel-body" style="color: var(--fastapi-panel-color-text);">章节文档</span>
+                      <span class="fastapi-panel-caption" style="color: var(--fastapi-panel-color-primary-deep);">docs/lessons</span>
+                    </div>
+                    <p class="mt-2 text-[1.75rem] font-semibold leading-none" style="color: var(--fastapi-panel-color-text); font-family: var(--fastapi-panel-font-title); font-variant-numeric: tabular-nums;">20 篇</p>
+                  </div>
+                  <div class="rounded-[8px] border p-4" style="border-color: var(--fastapi-panel-color-border); background: var(--fastapi-panel-color-surface-alt);">
+                    <div class="flex items-center justify-between gap-3">
+                      <span class="fastapi-panel-body" style="color: var(--fastapi-panel-color-text);">测试入口</span>
+                      <span class="fastapi-panel-caption" style="color: var(--fastapi-panel-color-primary-deep);">pytest</span>
+                    </div>
+                    <p class="mt-2 text-[1.75rem] font-semibold leading-none" style="color: var(--fastapi-panel-color-text); font-family: var(--fastapi-panel-font-title); font-variant-numeric: tabular-nums;">test_01 ~ test_20</p>
+                  </div>
+                  <div class="rounded-[8px] border p-4" style="border-color: var(--fastapi-panel-color-border); background: var(--fastapi-panel-color-surface-alt);">
+                    <div class="flex items-center justify-between gap-3">
+                      <span class="fastapi-panel-body" style="color: var(--fastapi-panel-color-text);">项目入口</span>
+                      <span class="fastapi-panel-caption" style="color: var(--fastapi-panel-color-primary-deep);">app/main.py</span>
+                    </div>
+                    <p class="mt-2 fastapi-panel-body" style="color: var(--fastapi-panel-color-text-muted);">README、progress.json 与 tests 保持同一条教学叙事线，便于排查课程与代码偏移。</p>
+                  </div>
+                </div>
+              </article>
+            </section>
+
+            <section id="capability" class="grid gap-4 2xl:grid-cols-[1.25fr,0.95fr]">
+              <article class="rounded-[12px] border p-5 sm:p-6" style="background: var(--fastapi-panel-color-surface); border-color: var(--fastapi-panel-color-border);">
+                <div class="flex items-center justify-between gap-3">
+                  <div class="min-w-0">
+                    <h2 class="fastapi-panel-h2" style="color: var(--fastapi-panel-color-text); text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">接口能力</h2>
+                    <p class="mt-2 fastapi-panel-body" style="color: var(--fastapi-panel-color-text-muted);">控制面不只列路由，还强调“为什么维护者会点开它”：鉴权、版本化、缓存失效、评论实时链路与管理员动作都在这里汇总。</p>
+                  </div>
+                  <button type="button" data-dom-id="action-open-api" class="inline-flex items-center justify-center whitespace-nowrap rounded-[8px] border px-3.5 py-2 transition-[background-color,border-color,color] duration-150 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2" style="border-color: var(--fastapi-panel-color-border); color: var(--fastapi-panel-color-text); --tw-ring-color: var(--fastapi-panel-color-primary);" onmouseover="this.style.background='var(--fastapi-panel-color-surface-alt)'" onmouseout="this.style.background='transparent'">
+                    <span class="fastapi-panel-body">接口速查</span>
+                  </button>
+                </div>
+
+                <div class="mt-5 overflow-x-auto">
+                  <table class="min-w-full table-fixed border-separate border-spacing-y-2">
+                    <thead>
+                      <tr>
+                        <th class="w-[20%] px-3 text-left fastapi-panel-caption" style="color: var(--fastapi-panel-color-text-soft);">模块</th>
+                        <th class="w-[34%] px-3 text-left fastapi-panel-caption" style="color: var(--fastapi-panel-color-text-soft);">入口</th>
+                        <th class="w-[28%] px-3 text-left fastapi-panel-caption" style="color: var(--fastapi-panel-color-text-soft);">说明</th>
+                        <th class="w-[18%] px-3 text-left fastapi-panel-caption" style="color: var(--fastapi-panel-color-text-soft);">状态</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td class="rounded-l-[8px] border-y border-l px-3 py-3 fastapi-panel-body" style="background: var(--fastapi-panel-color-surface-alt); border-color: var(--fastapi-panel-color-border); color: var(--fastapi-panel-color-text);">auth</td>
+                        <td class="border-y px-3 py-3"><code class="fastapi-panel-caption truncate" style="color: var(--fastapi-panel-color-primary-deep);">/auth/register · /auth/token · /me</code></td>
+                        <td class="border-y px-3 py-3 fastapi-panel-body" style="border-color: var(--fastapi-panel-color-border); color: var(--fastapi-panel-color-text-muted);">注册、登录与 JWT 身份确认。</td>
+                        <td class="rounded-r-[8px] border-y border-r px-3 py-3" style="border-color: var(--fastapi-panel-color-border);"><span class="fastapi-panel-caption inline-flex items-center justify-center whitespace-nowrap rounded-[8px] px-2.5 py-1" style="background: var(--fastapi-panel-color-primary-soft); color: var(--fastapi-panel-color-primary);">已挂载</span></td>
+                      </tr>
+                      <tr>
+                        <td class="rounded-l-[8px] border-y border-l px-3 py-3 fastapi-panel-body" style="background: var(--fastapi-panel-color-surface-alt); border-color: var(--fastapi-panel-color-border); color: var(--fastapi-panel-color-text);">admin</td>
+                        <td class="border-y px-3 py-3"><code class="fastapi-panel-caption truncate" style="color: var(--fastapi-panel-color-primary-deep);">DELETE /admin/posts/{post_id}</code></td>
+                        <td class="border-y px-3 py-3 fastapi-panel-body" style="border-color: var(--fastapi-panel-color-border); color: var(--fastapi-panel-color-text-muted);">管理员 scope 删除违规文章并触发缓存失效。</td>
+                        <td class="rounded-r-[8px] border-y border-r px-3 py-3" style="border-color: var(--fastapi-panel-color-border);"><span class="fastapi-panel-caption inline-flex items-center justify-center whitespace-nowrap rounded-[8px] px-2.5 py-1" style="background: var(--fastapi-panel-color-primary-soft); color: var(--fastapi-panel-color-primary);">受控</span></td>
+                      </tr>
+                      <tr>
+                        <td class="rounded-l-[8px] border-y border-l px-3 py-3 fastapi-panel-body" style="background: var(--fastapi-panel-color-surface-alt); border-color: var(--fastapi-panel-color-border); color: var(--fastapi-panel-color-text);">websocket</td>
+                        <td class="border-y px-3 py-3"><code class="fastapi-panel-caption truncate" style="color: var(--fastapi-panel-color-primary-deep);">/ws/posts/{post_id}/comments</code></td>
+                        <td class="border-y px-3 py-3 fastapi-panel-body" style="border-color: var(--fastapi-panel-color-border); color: var(--fastapi-panel-color-text-muted);">评论房间、广播、心跳与断线清理。</td>
+                        <td class="rounded-r-[8px] border-y border-r px-3 py-3" style="border-color: var(--fastapi-panel-color-border);"><span class="fastapi-panel-caption inline-flex items-center justify-center whitespace-nowrap rounded-[8px] px-2.5 py-1" style="background: var(--fastapi-panel-color-primary-soft); color: var(--fastapi-panel-color-primary);">实时</span></td>
+                      </tr>
+                      <tr>
+                        <td class="rounded-l-[8px] border-y border-l px-3 py-3 fastapi-panel-body" style="background: var(--fastapi-panel-color-surface-alt); border-color: var(--fastapi-panel-color-border); color: var(--fastapi-panel-color-text);">cache</td>
+                        <td class="border-y px-3 py-3"><code class="fastapi-panel-caption truncate" style="color: var(--fastapi-panel-color-primary-deep);">post:list:* · TTL 60s</code></td>
+                        <td class="border-y px-3 py-3 fastapi-panel-body" style="border-color: var(--fastapi-panel-color-border); color: var(--fastapi-panel-color-text-muted);">cache-aside、单飞锁、防穿透与异常降级。</td>
+                        <td class="rounded-r-[8px] border-y border-r px-3 py-3" style="border-color: var(--fastapi-panel-color-border);"><span class="fastapi-panel-caption inline-flex items-center justify-center whitespace-nowrap rounded-[8px] px-2.5 py-1" style="background: var(--fastapi-panel-color-primary-soft); color: var(--fastapi-panel-color-primary);">可回退</span></td>
+                      </tr>
+                      <tr>
+                        <td class="rounded-l-[8px] border-y border-l px-3 py-3 fastapi-panel-body" style="background: var(--fastapi-panel-color-surface-alt); border-color: var(--fastapi-panel-color-border); color: var(--fastapi-panel-color-text);">scheduler</td>
+                        <td class="border-y px-3 py-3"><code class="fastapi-panel-caption truncate" style="color: var(--fastapi-panel-color-primary-deep);">startup · shutdown · hot_posts</code></td>
+                        <td class="border-y px-3 py-3 fastapi-panel-body" style="border-color: var(--fastapi-panel-color-border); color: var(--fastapi-panel-color-text-muted);">APScheduler 在启动时注册统计任务并在关闭时清理。</td>
+                        <td class="rounded-r-[8px] border-y border-r px-3 py-3" style="border-color: var(--fastapi-panel-color-border);"><span class="fastapi-panel-caption inline-flex items-center justify-center whitespace-nowrap rounded-[8px] px-2.5 py-1" style="background: var(--fastapi-panel-color-primary-soft); color: var(--fastapi-panel-color-primary);">已接线</span></td>
+                      </tr>
+                      <tr>
+                        <td class="rounded-l-[8px] border-y border-l px-3 py-3 fastapi-panel-body" style="background: var(--fastapi-panel-color-surface-alt); border-color: var(--fastapi-panel-color-border); color: var(--fastapi-panel-color-text);">deploy</td>
+                        <td class="border-y px-3 py-3"><code class="fastapi-panel-caption truncate" style="color: var(--fastapi-panel-color-primary-deep);">Dockerfile · docker-compose.yml</code></td>
+                        <td class="border-y px-3 py-3 fastapi-panel-body" style="border-color: var(--fastapi-panel-color-border); color: var(--fastapi-panel-color-text-muted);">多阶段构建、Gunicorn 4 worker 与 /health HEALTHCHECK。</td>
+                        <td class="rounded-r-[8px] border-y border-r px-3 py-3" style="border-color: var(--fastapi-panel-color-border);"><span class="fastapi-panel-caption inline-flex items-center justify-center whitespace-nowrap rounded-[8px] px-2.5 py-1" style="background: var(--fastapi-panel-color-primary-soft); color: var(--fastapi-panel-color-primary);">可部署</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </article>
+
+              <article class="rounded-[12px] border p-5 sm:p-6" style="background: var(--fastapi-panel-color-surface); border-color: var(--fastapi-panel-color-border);">
+                <div class="flex items-center justify-between gap-3">
+                  <div class="min-w-0">
+                    <h2 class="fastapi-panel-h2" style="color: var(--fastapi-panel-color-text); text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">模块覆盖</h2>
+                    <p class="mt-2 fastapi-panel-body" style="color: var(--fastapi-panel-color-text-muted);">能力点基于当前控制面收录的关键维护入口与路由数，帮助快速判断每个模块的维护重量级。</p>
+                  </div>
+                  <i data-lucide="chart-no-axes-column" class="h-5 w-5 shrink-0" style="color: var(--fastapi-panel-color-primary);"></i>
+                </div>
+                <div class="mt-5 h-[340px]">
+                  <canvas id="moduleCoverageChart" width="560" height="360" aria-label="模块覆盖横向条图"></canvas>
+                </div>
+                <div class="mt-4 space-y-2">
+                  <div class="flex items-center justify-between gap-3">
+                    <span class="fastapi-panel-body truncate" style="color: var(--fastapi-panel-color-text);">版本化 API</span>
+                    <span class="fastapi-panel-caption whitespace-nowrap" style="color: var(--fastapi-panel-color-text-soft);">/api/v1 · /api/v2</span>
+                  </div>
+                  <div class="flex items-center justify-between gap-3">
+                    <span class="fastapi-panel-body truncate" style="color: var(--fastapi-panel-color-text);">文档系统</span>
+                    <span class="fastapi-panel-caption whitespace-nowrap" style="color: var(--fastapi-panel-color-text-soft);">/docs · /openapi.json</span>
+                  </div>
+                  <div class="flex items-center justify-between gap-3">
+                    <span class="fastapi-panel-body truncate" style="color: var(--fastapi-panel-color-text);">管理员动作</span>
+                    <span class="fastapi-panel-caption whitespace-nowrap" style="color: var(--fastapi-panel-color-text-soft);">scope=admin</span>
+                  </div>
+                </div>
+              </article>
+            </section>
+
+            <section class="grid gap-4 2xl:grid-cols-[1.05fr,0.95fr]">
+              <article id="runtime" class="rounded-[12px] border p-5 sm:p-6" style="background: var(--fastapi-panel-color-surface); border-color: var(--fastapi-panel-color-border);">
+                <div class="flex items-center justify-between gap-3">
+                  <div class="min-w-0">
+                    <h2 class="fastapi-panel-h2" style="color: var(--fastapi-panel-color-text); text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">运行运维</h2>
+                    <p class="mt-2 fastapi-panel-body" style="color: var(--fastapi-panel-color-text-muted);">围绕“能启动、能观测、能部署、可回退”整理运行面。静态信息来源于 Dockerfile、README 与缓存服务实现。</p>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <button type="button" data-dom-id="action-open-deploy" class="inline-flex items-center justify-center whitespace-nowrap rounded-[8px] border px-3.5 py-2 transition-[background-color,border-color,color] duration-150 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2" style="border-color: var(--fastapi-panel-color-border); color: var(--fastapi-panel-color-text); --tw-ring-color: var(--fastapi-panel-color-primary);" onmouseover="this.style.background='var(--fastapi-panel-color-surface-alt)'" onmouseout="this.style.background='transparent'">
+                      <span class="fastapi-panel-body">查看部署</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="mt-5 grid gap-4 lg:grid-cols-[1.05fr,0.95fr]">
+                  <div class="space-y-3">
+                    <div class="flex items-start justify-between gap-3 rounded-[8px] border px-4 py-3 transition-[background-color,border-color,transform] duration-150 motion-reduce:transition-none hover:-translate-y-[2px]" style="border-color: var(--fastapi-panel-color-border); background: var(--fastapi-panel-color-surface-alt);">
+                      <div class="min-w-0">
+                        <p class="fastapi-panel-h3 truncate" style="color: var(--fastapi-panel-color-text);">健康链路</p>
+                        <p class="mt-1 fastapi-panel-body" style="color: var(--fastapi-panel-color-text-muted);">`/health` 用作 Docker HEALTHCHECK，根路径返回 docs_url。</p>
+                      </div>
+                      <span class="fastapi-panel-caption inline-flex items-center justify-center whitespace-nowrap rounded-[8px] px-2.5 py-1" style="background: var(--fastapi-panel-color-primary-soft); color: var(--fastapi-panel-color-primary);">稳定</span>
+                    </div>
+                    <div class="flex items-start justify-between gap-3 rounded-[8px] border px-4 py-3 transition-[background-color,border-color,transform] duration-150 motion-reduce:transition-none hover:-translate-y-[2px]" style="border-color: var(--fastapi-panel-color-border); background: var(--fastapi-panel-color-surface-alt);">
+                      <div class="min-w-0">
+                        <p class="fastapi-panel-h3 truncate" style="color: var(--fastapi-panel-color-text);">缓存策略</p>
+                        <p class="mt-1 fastapi-panel-body" style="color: var(--fastapi-panel-color-text-muted);">GET /posts 使用 TTL=60s，异常时自动降级回 DB。</p>
+                      </div>
+                      <span class="fastapi-panel-caption inline-flex items-center justify-center whitespace-nowrap rounded-[8px] px-2.5 py-1" style="background: var(--fastapi-panel-color-primary-soft); color: var(--fastapi-panel-color-primary);">回退</span>
+                    </div>
+                    <div class="flex items-start justify-between gap-3 rounded-[8px] border px-4 py-3 transition-[background-color,border-color,transform] duration-150 motion-reduce:transition-none hover:-translate-y-[2px]" style="border-color: var(--fastapi-panel-color-border); background: var(--fastapi-panel-color-surface-alt);">
+                      <div class="min-w-0">
+                        <p class="fastapi-panel-h3 truncate" style="color: var(--fastapi-panel-color-text);">部署形态</p>
+                        <p class="mt-1 fastapi-panel-body" style="color: var(--fastapi-panel-color-text-muted);">Docker 多阶段构建，compose 编排 blog、postgres、redis。</p>
+                      </div>
+                      <span class="fastapi-panel-caption inline-flex items-center justify-center whitespace-nowrap rounded-[8px] px-2.5 py-1" style="background: var(--fastapi-panel-color-primary-soft); color: var(--fastapi-panel-color-primary);">就绪</span>
+                    </div>
+                    <div class="flex items-start justify-between gap-3 rounded-[8px] border px-4 py-3 transition-[background-color,border-color,transform] duration-150 motion-reduce:transition-none hover:-translate-y-[2px]" style="border-color: var(--fastapi-panel-color-border); background: var(--fastapi-panel-color-surface-alt);">
+                      <div class="min-w-0">
+                        <p class="fastapi-panel-h3 truncate" style="color: var(--fastapi-panel-color-text);">工作进程</p>
+                        <p class="mt-1 fastapi-panel-body" style="color: var(--fastapi-panel-color-text-muted);">Gunicorn + UvicornWorker 默认 4 worker，保留优雅退出参数。</p>
+                      </div>
+                      <span class="fastapi-panel-caption inline-flex items-center justify-center whitespace-nowrap rounded-[8px] px-2.5 py-1" style="background: var(--fastapi-panel-color-primary-soft); color: var(--fastapi-panel-color-primary);">4 worker</span>
+                    </div>
+                  </div>
+                  <div class="rounded-[8px] border p-4" style="border-color: var(--fastapi-panel-color-border); background: var(--fastapi-panel-color-surface-alt);">
+                    <p class="fastapi-panel-h3" style="color: var(--fastapi-panel-color-text);">维护入口</p>
+                    <div class="mt-4 space-y-3">
+                      <div class="flex items-center justify-between gap-3 border-b pb-3" style="border-color: var(--fastapi-panel-color-border);">
+                        <span class="fastapi-panel-body" style="color: var(--fastapi-panel-color-text);">应用入口</span>
+                        <code class="fastapi-panel-caption whitespace-nowrap" style="color: var(--fastapi-panel-color-primary-deep);">app/main.py</code>
+                      </div>
+                      <div class="flex items-center justify-between gap-3 border-b pb-3" style="border-color: var(--fastapi-panel-color-border);">
+                        <span class="fastapi-panel-body" style="color: var(--fastapi-panel-color-text);">部署自检</span>
+                        <code class="fastapi-panel-caption whitespace-nowrap" style="color: var(--fastapi-panel-color-primary-deep);">verify-deploy.sh</code>
+                      </div>
+                      <div class="flex items-center justify-between gap-3 border-b pb-3" style="border-color: var(--fastapi-panel-color-border);">
+                        <span class="fastapi-panel-body" style="color: var(--fastapi-panel-color-text);">调度服务</span>
+                        <code class="fastapi-panel-caption whitespace-nowrap" style="color: var(--fastapi-panel-color-primary-deep);">services/scheduler.py</code>
+                      </div>
+                      <div class="flex items-center justify-between gap-3">
+                        <span class="fastapi-panel-body" style="color: var(--fastapi-panel-color-text);">缓存服务</span>
+                        <code class="fastapi-panel-caption whitespace-nowrap" style="color: var(--fastapi-panel-color-primary-deep);">services/cache.py</code>
+                      </div>
+                    </div>
+                    <div class="mt-5 rounded-[8px] border p-4" style="border-color: var(--fastapi-panel-color-border); background: var(--fastapi-panel-color-surface);">
+                      <p class="fastapi-panel-caption" style="color: var(--fastapi-panel-color-text-soft);">常用命令</p>
+                      <div class="mt-3 space-y-2">
+                        <code class="block truncate fastapi-panel-caption" style="color: var(--fastapi-panel-color-primary-deep);">uvicorn app.main:app --reload --host 127.0.0.1 --port 8000</code>
+                        <code class="block truncate fastapi-panel-caption" style="color: var(--fastapi-panel-color-primary-deep);">pytest tests/test_20_blog_e2e.py -q</code>
+                        <code class="block truncate fastapi-panel-caption" style="color: var(--fastapi-panel-color-primary-deep);">gunicorn app.main:app -k uvicorn.workers.UvicornWorker --workers 4</code>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </article>
+
+              <article id="activity" class="rounded-[12px] border p-5 sm:p-6" style="background: var(--fastapi-panel-color-surface); border-color: var(--fastapi-panel-color-border);">
+                <div class="flex items-center justify-between gap-3">
+                  <div class="min-w-0">
+                    <h2 class="fastapi-panel-h2" style="color: var(--fastapi-panel-color-text); text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">近期活动</h2>
+                    <p class="mt-2 fastapi-panel-body" style="color: var(--fastapi-panel-color-text-muted);">用最近完成的任务和维护快照代替空洞占位，让页面更接近日常打开的工程驾驶舱。</p>
+                  </div>
+                  <button type="button" data-dom-id="action-open-logs" class="inline-flex items-center justify-center whitespace-nowrap rounded-[8px] border px-3.5 py-2 transition-[background-color,border-color,color] duration-150 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2" style="border-color: var(--fastapi-panel-color-border); color: var(--fastapi-panel-color-text); --tw-ring-color: var(--fastapi-panel-color-primary);" onmouseover="this.style.background='var(--fastapi-panel-color-surface-alt)'" onmouseout="this.style.background='transparent'">
+                    <span class="fastapi-panel-body">查看日志</span>
+                  </button>
+                </div>
+                <div class="mt-5 space-y-3">
+                  <div class="rounded-[8px] border p-4 transition-[background-color,border-color,transform] duration-150 motion-reduce:transition-none hover:-translate-y-[2px]" style="border-color: var(--fastapi-panel-color-border); background: var(--fastapi-panel-color-surface-alt);">
+                    <div class="flex items-center justify-between gap-3">
+                      <p class="fastapi-panel-h3 truncate" style="color: var(--fastapi-panel-color-text);">task-20 综合实战</p>
+                      <span class="fastapi-panel-caption whitespace-nowrap" style="color: var(--fastapi-panel-color-text-soft);">c7a2d74</span>
+                    </div>
+                    <p class="mt-2 fastapi-panel-body" style="color: var(--fastapi-panel-color-text-muted);">注册、登录、发文、评论、WebSocket 广播、缓存命中与管理员删除串成完整博客链路。</p>
+                  </div>
+                  <div class="rounded-[8px] border p-4 transition-[background-color,border-color,transform] duration-150 motion-reduce:transition-none hover:-translate-y-[2px]" style="border-color: var(--fastapi-panel-color-border); background: var(--fastapi-panel-color-surface-alt);">
+                    <div class="flex items-center justify-between gap-3">
+                      <p class="fastapi-panel-h3 truncate" style="color: var(--fastapi-panel-color-text);">task-19 Docker 部署</p>
+                      <span class="fastapi-panel-caption whitespace-nowrap" style="color: var(--fastapi-panel-color-text-soft);">1cda230</span>
+                    </div>
+                    <p class="mt-2 fastapi-panel-body" style="color: var(--fastapi-panel-color-text-muted);">多阶段镜像、compose 编排、/health HEALTHCHECK 与 4 worker 生产运行配置已落地。</p>
+                  </div>
+                  <div class="rounded-[8px] border p-4 transition-[background-color,border-color,transform] duration-150 motion-reduce:transition-none hover:-translate-y-[2px]" style="border-color: var(--fastapi-panel-color-border); background: var(--fastapi-panel-color-surface-alt);">
+                    <div class="flex items-center justify-between gap-3">
+                      <p class="fastapi-panel-h3 truncate" style="color: var(--fastapi-panel-color-text);">task-18 Redis 缓存</p>
+                      <span class="fastapi-panel-caption whitespace-nowrap" style="color: var(--fastapi-panel-color-text-soft);">402fb56</span>
+                    </div>
+                    <p class="mt-2 fastapi-panel-body" style="color: var(--fastapi-panel-color-text-muted);">cache-aside、TTL 60s、单飞锁与缓存异常降级规则已加入服务层。</p>
+                  </div>
+                  <div class="rounded-[8px] border p-4 transition-[background-color,border-color,transform] duration-150 motion-reduce:transition-none hover:-translate-y-[2px]" style="border-color: var(--fastapi-panel-color-border); background: var(--fastapi-panel-color-surface-alt);">
+                    <div class="flex items-center justify-between gap-3">
+                      <p class="fastapi-panel-h3 truncate" style="color: var(--fastapi-panel-color-text);">task-15 OpenAPI</p>
+                      <span class="fastapi-panel-caption whitespace-nowrap" style="color: var(--fastapi-panel-color-text-soft);">6ff41a5</span>
+                    </div>
+                    <p class="mt-2 fastapi-panel-body" style="color: var(--fastapi-panel-color-text-muted);">/api/v1 与 /api/v2 并存，自定义 /docs 标题并保留 deprecated 示例。</p>
+                  </div>
+                </div>
+
+                <div class="mt-5 rounded-[8px] border p-4" style="border-color: var(--fastapi-panel-color-border); background: var(--fastapi-panel-color-surface-alt);">
+                  <div class="flex items-center justify-between gap-3">
+                    <p class="fastapi-panel-h3" style="color: var(--fastapi-panel-color-text);">维护快照</p>
+                    <span class="fastapi-panel-caption" style="color: var(--fastapi-panel-color-text-soft);">当前仓库</span>
+                  </div>
+                  <div class="mt-4 space-y-2">
+                    <div class="flex items-center justify-between gap-3 rounded-[8px] px-3 py-2" style="background: var(--fastapi-panel-color-surface);">
+                      <span class="fastapi-panel-caption truncate" style="color: var(--fastapi-panel-color-text-muted);">INFO · /health</span>
+                      <span class="fastapi-panel-caption whitespace-nowrap" style="color: var(--fastapi-panel-color-success);">200 / ok</span>
+                    </div>
+                    <div class="flex items-center justify-between gap-3 rounded-[8px] px-3 py-2" style="background: var(--fastapi-panel-color-surface);">
+                      <span class="fastapi-panel-caption truncate" style="color: var(--fastapi-panel-color-text-muted);">INFO · /docs</span>
+                      <span class="fastapi-panel-caption whitespace-nowrap" style="color: var(--fastapi-panel-color-info);">已挂载</span>
+                    </div>
+                    <div class="flex items-center justify-between gap-3 rounded-[8px] px-3 py-2" style="background: var(--fastapi-panel-color-surface);">
+                      <span class="fastapi-panel-caption truncate" style="color: var(--fastapi-panel-color-text-muted);">WARN · Redis 缺失</span>
+                      <span class="fastapi-panel-caption whitespace-nowrap" style="color: var(--fastapi-panel-color-warning);">降级到 DB</span>
+                    </div>
+                    <div class="flex items-center justify-between gap-3 rounded-[8px] px-3 py-2" style="background: var(--fastapi-panel-color-surface);">
+                      <span class="fastapi-panel-caption truncate" style="color: var(--fastapi-panel-color-text-muted);">READY · 部署</span>
+                      <span class="fastapi-panel-caption whitespace-nowrap" style="color: var(--fastapi-panel-color-primary-deep);">worker=4</span>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </section>
+
+            <footer class="rounded-[12px] border px-5 py-4 sm:px-6" style="background: var(--fastapi-panel-color-surface); border-color: var(--fastapi-panel-color-border);">
+              <div class="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+                <div class="min-w-0">
+                  <p class="fastapi-panel-h3" style="color: var(--fastapi-panel-color-text);">维护摘要</p>
+                  <p class="mt-1 fastapi-panel-body" style="color: var(--fastapi-panel-color-text-muted);">仓库已形成“课程文档 + 渐进源码 + pytest 套件 + Docker 部署”的闭环，适合作为教学博客 API 的日常驾驶舱。</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 xl:justify-end">
+                  <span class="fastapi-panel-caption inline-flex items-center justify-center whitespace-nowrap rounded-[8px] px-3 py-1.5" style="background: var(--fastapi-panel-color-surface-alt); color: var(--fastapi-panel-color-text-muted);">/docs</span>
+                  <span class="fastapi-panel-caption inline-flex items-center justify-center whitespace-nowrap rounded-[8px] px-3 py-1.5" style="background: var(--fastapi-panel-color-surface-alt); color: var(--fastapi-panel-color-text-muted);">/health</span>
+                  <span class="fastapi-panel-caption inline-flex items-center justify-center whitespace-nowrap rounded-[8px] px-3 py-1.5" style="background: var(--fastapi-panel-color-surface-alt); color: var(--fastapi-panel-color-text-muted);">/api/v1</span>
+                  <span class="fastapi-panel-caption inline-flex items-center justify-center whitespace-nowrap rounded-[8px] px-3 py-1.5" style="background: var(--fastapi-panel-color-surface-alt); color: var(--fastapi-panel-color-text-muted);">/api/v2</span>
+                </div>
+              </div>
+            </footer>
+          </div>
+        </div>
+      </div>
+    </main>
+    <style>
+      button i,
+      [data-dom-id="action-open-docs"] i {
+        transition-property: transform;
+        transition-duration: 150ms;
+        transition-timing-function: cubic-bezier(.2,.8,.2,1);
+      }
+
+      [data-dom-id="action-open-docs"]:hover i,
+      [data-dom-id="action-open-docs"]:focus-visible i {
+        transform: translateX(2px);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        button,
+        a,
+        button i,
+        [data-dom-id="action-open-docs"] i {
+          transition-duration: 0.01ms !important;
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transform: none !important;
+        }
+      }
+    </style>
+    <script>
+      const rootStyle = getComputedStyle(document.documentElement);
+      const primary = rootStyle.getPropertyValue('--fastapi-panel-color-primary').trim();
+      const primarySoft = rootStyle.getPropertyValue('--fastapi-panel-color-primary-soft').trim();
+      const primaryDeep = rootStyle.getPropertyValue('--fastapi-panel-color-primary-deep').trim();
+      const border = rootStyle.getPropertyValue('--fastapi-panel-color-border').trim();
+      const text = rootStyle.getPropertyValue('--fastapi-panel-color-text').trim();
+      const muted = rootStyle.getPropertyValue('--fastapi-panel-color-text-muted').trim();
+      const soft = rootStyle.getPropertyValue('--fastapi-panel-color-text-soft').trim();
+
+      const commonGrid = {
+        color: border,
+        drawBorder: false
+      };
+
+      const commonTicks = {
+        color: soft,
+        font: {
+          family: 'Inter, PingFang SC, Microsoft YaHei, Segoe UI, sans-serif',
+          size: 11
+        }
+      };
+
+      new Chart(document.getElementById('taskCompletionChart'), {
+        type: 'doughnut',
+        data: {
+          labels: ['已完成', '占位'],
+          datasets: [{
+            data: [20, 0.001],
+            backgroundColor: [primary, border],
+            borderWidth: 0,
+            hoverOffset: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '76%',
+          plugins: {
+            legend: { display: false },
+            tooltip: { enabled: false }
+          }
+        }
+      });
+
+      new Chart(document.getElementById('courseProgressChart'), {
+        type: 'line',
+        data: {
+          labels: ['入门', '进阶', '工程化', '高级', '实战'],
+          datasets: [{
+            label: '累计完成任务',
+            data: [4, 8, 12, 16, 20],
+            borderColor: primary,
+            backgroundColor: primarySoft,
+            pointBackgroundColor: primary,
+            pointBorderColor: primary,
+            pointRadius: 4,
+            pointHoverRadius: 4,
+            tension: 0.28,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { intersect: false, mode: 'index' },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(7, 19, 24, 0.92)',
+              borderColor: border,
+              borderWidth: 1,
+              titleColor: text,
+              bodyColor: muted,
+              padding: 10,
+              displayColors: false
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: commonTicks
+            },
+            y: {
+              beginAtZero: true,
+              max: 20,
+              ticks: {
+                ...commonTicks,
+                stepSize: 4
+              },
+              grid: commonGrid
+            }
+          }
+        }
+      });
+
+      new Chart(document.getElementById('moduleCoverageChart'), {
+        type: 'bar',
+        data: {
+          labels: ['deploy', 'cache', 'scheduler', 'auth', 'admin', 'websocket'],
+          datasets: [{
+            label: '能力点',
+            data: [4, 4, 3, 3, 1, 1],
+            backgroundColor: [primary, primary, primary, primaryDeep, primarySoft, border],
+            borderRadius: 6,
+            borderSkipped: false
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(7, 19, 24, 0.92)',
+              borderColor: border,
+              borderWidth: 1,
+              titleColor: text,
+              bodyColor: muted,
+              padding: 10,
+              displayColors: false
+            }
+          },
+          scales: {
+            x: {
+              beginAtZero: true,
+              max: 4,
+              ticks: {
+                ...commonTicks,
+                stepSize: 1
+              },
+              grid: commonGrid
+            },
+            y: {
+              grid: { display: false },
+              ticks: commonTicks
+            }
+          }
+        }
+      });
+
+      lucide.createIcons();
+    </script>
+</body>
+</html>
